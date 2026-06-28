@@ -1,0 +1,112 @@
+{
+  "copied": [
+    {
+      "name": "pxr-challenge_TRAIN.csv",
+      "src": "/content/data/pxr-challenge_TRAIN.csv",
+      "bytes": 858677
+    },
+    {
+      "name": "pxr-challenge_TEST_BLINDED.csv",
+      "src": "/content/data/pxr-challenge_TEST_BLINDED.csv",
+      "bytes": 31805
+    },
+    {
+      "name": "phase1_unblinded.csv",
+      "src": "/content/data/phase1_unblinded.csv",
+      "bytes": 17426
+    },
+    {
+      "name": "multitask_train.csv",
+      "src": "/content/data/multitask_train.csv",
+      "bytes": 576482
+    },
+    {
+      "name": "pxr-challenge_counter-assay_TRAIN.csv",
+      "src": "/content/data/pxr-challenge_counter-assay_TRAIN.csv",
+      "bytes": 598132
+    },
+    {
+      "name": "iw2_3seed_ep17-23.csv",
+      "src": "/content/submissions/iw2_3seed_ep17-23.csv",
+      "bytes": 41061
+    },
+    {
+      "name": "chemeleon_mt_lr3e-04_s0.csv",
+      "src": "/content/submissions/chemeleon_mt_lr3e-04_s0.csv",
+      "bytes": 36676
+    },
+    {
+      "name": "chemeleon_mt_lr3e-04_s1.csv",
+      "src": "/content/submissions/chemeleon_mt_lr3e-04_s1.csv",
+      "bytes": 36693
+    },
+    {
+      "name": "chemeleon_mt_lr3e-04_s2.csv",
+      "src": "/content/submissions/chemeleon_mt_lr3e-04_s2.csv",
+      "bytes": 36663
+    },
+    {
+      "name": "chemeleon_mt_lr3e-04_3seed.csv",
+      "src": "/content/submissions/chemeleon_mt_lr3e-04_3seed.csv",
+      "bytes": 40346
+    },
+    {
+      "name": "MOONSHOT_FINAL_RECOMMENDED.csv",
+      "src": "/content/submissions/MOONSHOT_FINAL_RECOMMENDED.csv",
+      "bytes": 38426
+    },
+    {
+      "name": "big_push_guarded_aux_residual.csv",
+      "src": "/content/submissions/big_push_guarded_aux_residual.csv",
+      "bytes": 38413
+    },
+    {
+      "name": "big_push_high_upside_aux_residual.csv",
+      "src": "/content/submissions/big_push_high_upside_aux_residual.csv",
+      "bytes": 38425
+    },
+    {
+      "name": "ens_cm_lr3e-04_3seed_sur_w0.300.csv",
+      "src": "/content/scripts/ens_cm_lr3e-04_3seed_sur_w0.300.csv",
+      "bytes": 41079
+    },
+    {
+      "name": "ens_cm_lr3e-04_3seed_sur_w0.400.csv",
+      "src": "/content/submissions/ens_cm_lr3e-04_3seed_sur_w0.400.csv",
+      "bytes": 41069
+    },
+    {
+      "name": "ens_cm_lr3e-04_3seed_sur_w0.350.csv",
+      "src": "/content/submissions/ens_cm_lr3e-04_3seed_sur_w0.350.csv",
+      "bytes": 41073
+    },
+    {
+      "name": "ens_cm_lr3e-04_3seed_sur_w0.325.csv",
+      "src": "/content/submissions/ens_cm_lr3e-04_3seed_sur_w0.325.csv",
+      "bytes": 41082
+    },
+    {
+      "name": "ens_cm_lr3e-04_3seed_sur_w0.200.csv",
+      "src": "/content/submissions/ens_cm_lr3e-04_3seed_sur_w0.200.csv",
+      "bytes": 41079
+    },
+    {
+      "name": "ens_cm_lr3e-04_3seed_sur_w0.250.csv",
+      "src": "/content/submissions/ens_cm_lr3e-04_3seed_sur_w0.250.csv",
+      "bytes": 41070
+    },
+    {
+      "name": "rank1_tail_active_guarded.csv",
+      "src": "/content/submissions/rank1_tail_active_guarded.csv",
+      "bytes": 38426
+    }
+  ],
+  "missing_exact": [
+    "ens_cm_lr3e-04_1seed_sur_w0.3.csv",
+    "ens_cm_lr3e-04_1seed_sur_w0.3_auto.csv",
+    "ens_countermt_lr3e-04_3seed_sur_w0.3.csv",
+    "ens_countermt_lr3e-04_3seed_sur_w0.325_phase1best.csv",
+    "improved_cv_residual_calibrated_core.csv"
+  ],
+  "skipped": []
+}

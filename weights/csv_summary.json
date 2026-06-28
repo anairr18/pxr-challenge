@@ -1,0 +1,293 @@
+[
+  {
+    "file": "MOONSHOT_FINAL_RECOMMENDED.csv",
+    "rows": 513,
+    "cols": [
+      "SMILES",
+      "Molecule Name",
+      "pEC50"
+    ],
+    "pEC50_nan": 0,
+    "pEC50_finite": true,
+    "pEC50_mean": 4.758646493072935,
+    "pEC50_std": 0.8741412856035314
+  },
+  {
+    "file": "big_push_guarded_aux_residual.csv",
+    "rows": 513,
+    "cols": [
+      "SMILES",
+      "Molecule Name",
+      "pEC50"
+    ],
+    "pEC50_nan": 0,
+    "pEC50_finite": true,
+    "pEC50_mean": 4.768210278608227,
+    "pEC50_std": 0.8642183928505004
+  },
+  {
+    "file": "big_push_high_upside_aux_residual.csv",
+    "rows": 513,
+    "cols": [
+      "SMILES",
+      "Molecule Name",
+      "pEC50"
+    ],
+    "pEC50_nan": 0,
+    "pEC50_finite": true,
+    "pEC50_mean": 4.7658429801387365,
+    "pEC50_std": 0.8661426145107587
+  },
+  {
+    "file": "chemeleon_mt_lr3e-04_3seed.csv",
+    "rows": 513,
+    "cols": [
+      "SMILES",
+      "Molecule Name",
+      "pEC50"
+    ],
+    "pEC50_nan": 0,
+    "pEC50_finite": true,
+    "pEC50_mean": 4.9447458165042235,
+    "pEC50_std": 0.7336514614928012
+  },
+  {
+    "file": "chemeleon_mt_lr3e-04_s0.csv",
+    "rows": 513,
+    "cols": [
+      "SMILES",
+      "Molecule Name",
+      "pEC50"
+    ],
+    "pEC50_nan": 0,
+    "pEC50_finite": true,
+    "pEC50_mean": 4.968535234113061,
+    "pEC50_std": 0.7324210771849615
+  },
+  {
+    "file": "chemeleon_mt_lr3e-04_s1.csv",
+    "rows": 513,
+    "cols": [
+      "SMILES",
+      "Molecule Name",
+      "pEC50"
+    ],
+    "pEC50_nan": 0,
+    "pEC50_finite": true,
+    "pEC50_mean": 4.936032860233918,
+    "pEC50_std": 0.7513865544820437
+  },
+  {
+    "file": "chemeleon_mt_lr3e-04_s2.csv",
+    "rows": 513,
+    "cols": [
+      "SMILES",
+      "Molecule Name",
+      "pEC50"
+    ],
+    "pEC50_nan": 0,
+    "pEC50_finite": true,
+    "pEC50_mean": 4.929669355165692,
+    "pEC50_std": 0.7316719913961359
+  },
+  {
+    "file": "ens_cm_lr3e-04_3seed_sur_w0.200.csv",
+    "rows": 513,
+    "cols": [
+      "SMILES",
+      "Molecule Name",
+      "pEC50"
+    ],
+    "pEC50_nan": 0,
+    "pEC50_finite": true,
+    "pEC50_mean": 4.8380023671955685,
+    "pEC50_std": 0.6640184096973162
+  },
+  {
+    "file": "ens_cm_lr3e-04_3seed_sur_w0.250.csv",
+    "rows": 513,
+    "cols": [
+      "SMILES",
+      "Molecule Name",
+      "pEC50"
+    ],
+    "pEC50_nan": 0,
+    "pEC50_finite": true,
+    "pEC50_mean": 4.844673832777359,
+    "pEC50_std": 0.6631835865474749
+  },
+  {
+    "file": "ens_cm_lr3e-04_3seed_sur_w0.300.csv",
+    "rows": 513,
+    "cols": [
+      "SMILES",
+      "Molecule Name",
+      "pEC50"
+    ],
+    "pEC50_nan": 0,
+    "pEC50_finite": true,
+    "pEC50_mean": 4.85134529835915,
+    "pEC50_std": 0.663071078037316
+  },
+  {
+    "file": "ens_cm_lr3e-04_3seed_sur_w0.325.csv",
+    "rows": 513,
+    "cols": [
+      "SMILES",
+      "Molecule Name",
+      "pEC50"
+    ],
+    "pEC50_nan": 0,
+    "pEC50_finite": true,
+    "pEC50_mean": 4.854681031150046,
+    "pEC50_std": 0.6632858988150085
+  },
+  {
+    "file": "ens_cm_lr3e-04_3seed_sur_w0.350.csv",
+    "rows": 513,
+    "cols": [
+      "SMILES",
+      "Molecule Name",
+      "pEC50"
+    ],
+    "pEC50_nan": 0,
+    "pEC50_finite": true,
+    "pEC50_mean": 4.858016763940941,
+    "pEC50_std": 0.6636812515114032
+  },
+  {
+    "file": "ens_cm_lr3e-04_3seed_sur_w0.400.csv",
+    "rows": 513,
+    "cols": [
+      "SMILES",
+      "Molecule Name",
+      "pEC50"
+    ],
+    "pEC50_nan": 0,
+    "pEC50_finite": true,
+    "pEC50_mean": 4.864688229522732,
+    "pEC50_std": 0.6650121177095143
+  },
+  {
+    "file": "iw2_3seed_ep17-23.csv",
+    "rows": 513,
+    "cols": [
+      "SMILES",
+      "Molecule Name",
+      "pEC50"
+    ],
+    "pEC50_nan": 0,
+    "pEC50_finite": true,
+    "pEC50_mean": 4.811316504868405,
+    "pEC50_std": 0.6744924049732857
+  },
+  {
+    "file": "multitask_train.csv",
+    "rows": 4575,
+    "cols": [
+      "SMILES",
+      "OCNT_ID",
+      "pEC50",
+      "pEC50_se",
+      "log2fc_8um",
+      "log2fc_8um_se",
+      "log2fc_33um",
+      "log2fc_33um_se",
+      "source"
+    ],
+    "pEC50_nan": 0,
+    "pEC50_finite": true,
+    "pEC50_mean": 4.370008084783801,
+    "pEC50_std": 1.136414209568007
+  },
+  {
+    "file": "phase1_unblinded.csv",
+    "rows": 253,
+    "cols": [
+      "Molecule Name",
+      "SMILES",
+      "pEC50"
+    ],
+    "pEC50_nan": 0,
+    "pEC50_finite": true,
+    "pEC50_mean": 4.664110671936759,
+    "pEC50_std": 1.0340509698936693
+  },
+  {
+    "file": "pxr-challenge_TEST_BLINDED.csv",
+    "rows": 513,
+    "cols": [
+      "Molecule Name",
+      "SMILES"
+    ]
+  },
+  {
+    "file": "pxr-challenge_TRAIN.csv",
+    "rows": 4139,
+    "cols": [
+      "Molecule Name",
+      "SMILES",
+      "OCNT Batch",
+      "pEC50",
+      "Emax_estimate (log2FC vs. baseline)",
+      "Emax.vs.pos.ctrl_estimate (dimensionless)",
+      "pEC50_std.error (-log10(molarity))",
+      "Emax_std.error (log2FC vs. baseline)",
+      "Emax.vs.pos.ctrl_std.error (dimensionless)",
+      "pEC50_ci.lower (-log10(molarity))",
+      "pEC50_ci.upper (-log10(molarity))",
+      "Emax_ci.lower (log2FC vs. baseline)",
+      "Emax_ci.upper (log2FC vs. baseline)",
+      "Emax.vs.pos.ctrl_ci.lower (dimensionless)",
+      "Emax.vs.pos.ctrl_ci.upper (dimensionless)",
+      "Split",
+      "OCNT_ID",
+      "source"
+    ],
+    "pEC50_nan": 0,
+    "pEC50_finite": true,
+    "pEC50_mean": 4.321067541487525,
+    "pEC50_std": 1.1216164730641809
+  },
+  {
+    "file": "pxr-challenge_counter-assay_TRAIN.csv",
+    "rows": 2859,
+    "cols": [
+      "Molecule Name",
+      "SMILES",
+      "OCNT Batch",
+      "pEC50",
+      "Emax_estimate (log2FC vs. baseline)",
+      "Emax.vs.pos.ctrl_estimate (dimensionless)",
+      "pEC50_std.error (-log10(molarity))",
+      "Emax_std.error (log2FC vs. baseline)",
+      "Emax.vs.pos.ctrl_std.error (dimensionless)",
+      "pEC50_ci.lower (-log10(molarity))",
+      "pEC50_ci.upper (-log10(molarity))",
+      "Emax_ci.lower (log2FC vs. baseline)",
+      "Emax_ci.upper (log2FC vs. baseline)",
+      "Emax.vs.pos.ctrl_ci.lower (dimensionless)",
+      "Emax.vs.pos.ctrl_ci.upper (dimensionless)",
+      "Split",
+      "OCNT_ID",
+      "source"
+    ],
+    "pEC50_nan": 212,
+    "pEC50_finite": false,
+    "pEC50_mean": 3.1310439491247952,
+    "pEC50_std": 1.1204129787751018
+  },
+  {
+    "file": "rank1_tail_active_guarded.csv",
+    "rows": 513,
+    "cols": [
+      "SMILES",
+      "Molecule Name",
+      "pEC50"
+    ],
+    "pEC50_nan": 0,
+    "pEC50_finite": true,
+    "pEC50_mean": 4.758646493072935,
+    "pEC50_std": 0.8741412856035314
+  }
+]

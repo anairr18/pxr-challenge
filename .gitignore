@@ -1,0 +1,37 @@
+# Virtual environments
+.venv/
+venv/
+
+# Training runs, logs, checkpoints
+runs/
+wandb/
+*.ckpt
+*.pt
+*.pth
+
+# Large local data and caches
+data/.cache/
+models/suiren/weights/model.pt
+
+# Python
+__pycache__/
+.ipynb_checkpoints/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+
+# Generated outputs
+artifacts/
+outputs/
+submissions/*.parquet
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
