@@ -12,15 +12,33 @@ The modeling story is intentionally honest-first: the main submission is built
 around a Suiren/CheMeleon neural ensemble, with optional guarded residual
 calibration and a strict audit layer that rejects exact-filled Phase 1 files.
 
-## Current Recommended Candidate
+## Final Submission Recommendation
 
-The current clean candidate from the saved bundle audit is:
+The file I would upload to the activity track is:
+
+```text
+submissions/submission_activity_phase2.csv
+```
+
+This is a canonical copy of:
+
+```text
+submissions/rank1_tail_active_guarded.csv
+```
+
+`rank1_tail_active_guarded.csv` and `MOONSHOT_FINAL_RECOMMENDED.csv` are
+byte-for-byte identical in this repo. The guarded file is exact-filled on the
+253 revealed Phase 1 rows, so it is not valid for direct honest Phase 1 scoring,
+but it is the best supported upload candidate because its residual-calibrated
+hidden/test predictions are backed by the nested-CV diagnostic.
+
+The best clean non-exact baseline from direct Phase 1 audit is:
 
 ```text
 submissions/ens_cm_lr3e-04_3seed_sur_w0.325.csv
 ```
 
-Its honest Phase 1 audit result was approximately:
+Its honest direct Phase 1 audit result is:
 
 ```text
 MAE ~= 0.437
@@ -35,7 +53,8 @@ MAE ~= 0.424
 RAE ~= 0.559
 ```
 
-However, exact-filled Phase 1 rows are never used as direct honest scores.
+So the clean blend is the baseline evidence, while
+`submission_activity_phase2.csv` is the final upload file.
 
 ## Repository Layout
 
@@ -71,6 +90,7 @@ openadmet_pxr_submission_repo/
     selection.py
   submissions/
     README.md
+    submission_activity_phase2.csv
   weights/
     ensemble_manifest.json
 ```

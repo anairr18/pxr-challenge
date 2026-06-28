@@ -1,5 +1,12 @@
 {
   "project": "OpenADMET PXR",
+  "final_upload_submission": "submission_activity_phase2.csv",
+  "final_upload_source": "rank1_tail_active_guarded.csv",
+  "final_upload_nested_cv_estimate": {
+    "mae": 0.424,
+    "rae": 0.559,
+    "note": "Guarded residual-calibrated model; do not direct-score exact-filled Phase 1 rows."
+  },
   "honest_best_submission": "ens_cm_lr3e-04_3seed_sur_w0.325.csv",
   "current_honest_phase1_mae": 0.437332,
   "current_honest_phase1_rae_fixed_denom": 0.577259,
@@ -27,4 +34,3 @@
     "chemeleon_mt_lr3e-04_3seed.csv"
   ]
 }
-
