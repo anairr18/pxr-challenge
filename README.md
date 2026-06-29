@@ -186,6 +186,35 @@ The experiment deliberately does **not** replace
 `submissions/openadmet_pxr_activity_final_submission.csv`. A new candidate is
 eligible for replacement only if the nested-CV acceptance gate passes.
 
+## Genuinely Independent Signal Test
+
+Most prior additions were not independent enough: RDKit trees, UniMol,
+ChemBERTa, counter-assay residuals, and tail gates were all either weak,
+over-correlated with the Suiren/CheMeleon anchor, or unstable across folds.
+
+The strongest next independent signal is public human PXR pharmacology from
+ChEMBL target `CHEMBL3401` / NR1I2. This is not trained from the OCNT challenge
+curve-fit labels. It is an external PXR biology source that can be converted
+into activation-like and inhibition-like auxiliary predictions, then tested
+against the frozen anchor under the same nested-CV gate.
+
+Run:
+
+```bash
+python scripts/run_external_pxr_signal_experiment.py --root . --n-boot 5000
+```
+
+This writes:
+
+- `reports/external_chembl_pxr_signal_experiment/experiment_report.md`
+- `reports/external_chembl_pxr_signal_experiment/experiment_summary.json`
+- `submissions/external_chembl_pxr_signal_oof_candidate.csv`
+- `submissions/external_chembl_pxr_signal_upload_candidate.csv`
+
+The upload candidate is experimental. Keep
+`submissions/openadmet_pxr_activity_final_submission.csv` locked unless the
+external-signal report returns a review-for-replacement decision.
+
 ## Honest Metric Policy
 
 The audit scripts enforce these rules:
