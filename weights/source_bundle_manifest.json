@@ -26,33 +26,33 @@
       "bytes": 598132
     },
     {
-      "name": "suiren_inactive_tail_weighted_three_seed_predictions.csv",
-      "src": "/content/submissions/suiren_inactive_tail_weighted_three_seed_predictions.csv",
+      "name": "conformation_predictor_predictions.csv",
+      "src": "/content/submissions/conformation_predictor_predictions.csv",
       "bytes": 41061
     },
     {
-      "name": "chemeleon_multitask_seed0_predictions.csv",
-      "src": "/content/submissions/chemeleon_multitask_seed0_predictions.csv",
+      "name": "graph_multitask_seed0_predictions.csv",
+      "src": "/content/submissions/graph_multitask_seed0_predictions.csv",
       "bytes": 36676
     },
     {
-      "name": "chemeleon_multitask_seed1_predictions.csv",
-      "src": "/content/submissions/chemeleon_multitask_seed1_predictions.csv",
+      "name": "graph_multitask_seed1_predictions.csv",
+      "src": "/content/submissions/graph_multitask_seed1_predictions.csv",
       "bytes": 36693
     },
     {
-      "name": "chemeleon_multitask_seed2_predictions.csv",
-      "src": "/content/submissions/chemeleon_multitask_seed2_predictions.csv",
+      "name": "graph_multitask_seed2_predictions.csv",
+      "src": "/content/submissions/graph_multitask_seed2_predictions.csv",
       "bytes": 36663
     },
     {
-      "name": "chemeleon_multitask_three_seed_predictions.csv",
-      "src": "/content/submissions/chemeleon_multitask_three_seed_predictions.csv",
+      "name": "graph_multitask_ensemble_predictions.csv",
+      "src": "/content/submissions/graph_multitask_ensemble_predictions.csv",
       "bytes": 40346
     },
     {
-      "name": "guarded_residual_calibrated_submission_duplicate.csv",
-      "src": "/content/submissions/guarded_residual_calibrated_submission_duplicate.csv",
+      "name": "residual_calibrated_submission_backup.csv",
+      "src": "/content/submissions/residual_calibrated_submission_backup.csv",
       "bytes": 38426
     },
     {
@@ -66,46 +66,46 @@
       "bytes": 38425
     },
     {
-      "name": "suiren_chemeleon_blend_weight_0p300_predictions.csv",
-      "src": "/content/scripts/suiren_chemeleon_blend_weight_0p300_predictions.csv",
+      "name": "molecular_ensemble_weight_0p300_predictions.csv",
+      "src": "/content/scripts/molecular_ensemble_weight_0p300_predictions.csv",
       "bytes": 41079
     },
     {
-      "name": "suiren_chemeleon_blend_weight_0p400_predictions.csv",
-      "src": "/content/submissions/suiren_chemeleon_blend_weight_0p400_predictions.csv",
+      "name": "molecular_ensemble_weight_0p400_predictions.csv",
+      "src": "/content/submissions/molecular_ensemble_weight_0p400_predictions.csv",
       "bytes": 41069
     },
     {
-      "name": "suiren_chemeleon_blend_weight_0p350_predictions.csv",
-      "src": "/content/submissions/suiren_chemeleon_blend_weight_0p350_predictions.csv",
+      "name": "molecular_ensemble_weight_0p350_predictions.csv",
+      "src": "/content/submissions/molecular_ensemble_weight_0p350_predictions.csv",
       "bytes": 41073
     },
     {
-      "name": "suiren_chemeleon_blend_weight_0p325_predictions.csv",
-      "src": "/content/submissions/suiren_chemeleon_blend_weight_0p325_predictions.csv",
+      "name": "activity_predictions_clean_baseline.csv",
+      "src": "/content/submissions/activity_predictions_clean_baseline.csv",
       "bytes": 41082
     },
     {
-      "name": "suiren_chemeleon_blend_weight_0p200_predictions.csv",
-      "src": "/content/submissions/suiren_chemeleon_blend_weight_0p200_predictions.csv",
+      "name": "molecular_ensemble_weight_0p200_predictions.csv",
+      "src": "/content/submissions/molecular_ensemble_weight_0p200_predictions.csv",
       "bytes": 41079
     },
     {
-      "name": "suiren_chemeleon_blend_weight_0p250_predictions.csv",
-      "src": "/content/submissions/suiren_chemeleon_blend_weight_0p250_predictions.csv",
+      "name": "molecular_ensemble_weight_0p250_predictions.csv",
+      "src": "/content/submissions/molecular_ensemble_weight_0p250_predictions.csv",
       "bytes": 41070
     },
     {
-      "name": "guarded_residual_calibrated_submission.csv",
-      "src": "/content/submissions/guarded_residual_calibrated_submission.csv",
+      "name": "residual_calibrated_submission.csv",
+      "src": "/content/submissions/residual_calibrated_submission.csv",
       "bytes": 38426
     }
   ],
   "missing_exact": [
-    "suiren_chemeleon_single_seed_blend_weight_0p300_predictions.csv",
-    "suiren_chemeleon_single_seed_blend_weight_0p300_auto_predictions.csv",
-    "counter_multitask_suiren_chemeleon_blend_weight_0p300_predictions.csv",
-    "counter_multitask_suiren_chemeleon_blend_weight_0p325_phase1_selected_predictions.csv",
+    "single_seed_molecular_ensemble_weight_0p300_predictions.csv",
+    "single_seed_molecular_ensemble_weight_0p300_auto_predictions.csv",
+    "counter_multitask_molecular_ensemble_weight_0p300_predictions.csv",
+    "counter_multitask_molecular_ensemble_weight_0p325_phase1_selected_predictions.csv",
     "cross_validated_residual_calibrated_core_predictions.csv"
   ],
   "skipped": []

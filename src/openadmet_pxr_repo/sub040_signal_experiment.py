@@ -19,8 +19,8 @@ from .metrics import (
 )
 
 
-BASELINE_FILE = "suiren_chemeleon_blend_weight_0p325_predictions.csv"
-FINAL_UPLOAD_FILE = "openadmet_pxr_activity_final_submission.csv"
+BASELINE_FILE = "activity_predictions_clean_baseline.csv"
+FINAL_UPLOAD_FILE = "activity_predictions_final.csv"
 OOF_CANDIDATE_FILE = "structure_assay_residual_oof_candidate.csv"
 UPLOAD_CANDIDATE_FILE = "structure_assay_residual_upload_candidate.csv"
 

@@ -5,21 +5,21 @@ submission by accident.
 
 ## Current Locked Baselines
 
-- Clean non-exact baseline: `submissions/suiren_chemeleon_blend_weight_0p325_predictions.csv`
-- Current final upload: `submissions/openadmet_pxr_activity_final_submission.csv`
+- Clean non-exact baseline: `submissions/activity_predictions_clean_baseline.csv`
+- Current final upload: `submissions/activity_predictions_final.csv`
 - Clean direct Phase 1 evidence: MAE `0.4373`, RAE `0.5773`
 - Guarded residual diagnostic: about MAE `0.424`, RAE `0.559`
 
 ## Experiment Command
 
 ```bash
-python scripts/run_sub040_signal_experiment.py --root . --n-boot 5000
+python scripts/run_structure_assay_signal_experiment.py --root . --n-boot 5000
 ```
 
 For slower ETKDG/MMFF shape descriptors:
 
 ```bash
-python scripts/run_sub040_signal_experiment.py --root . --with-3d --n-boot 5000
+python scripts/run_structure_assay_signal_experiment.py --root . --with-3d --n-boot 5000
 ```
 
 ## What It Tests
@@ -27,7 +27,7 @@ python scripts/run_sub040_signal_experiment.py --root . --with-3d --n-boot 5000
 - Scaffold/bin-stratified outer folds over the 253 revealed Phase 1 molecules.
 - RDKit descriptors, train-fitted ECFP/FCFP SVD components, nearest-neighbor
   activity signals, assay auxiliary predictions, and optional 3D descriptors.
-- Capped residual models on top of the Suiren/CheMeleon anchor.
+- Capped residual models on top of the molecular-ensemble anchor.
 - Inner-fold model/config selection only, followed by outer-fold OOF scoring.
 - Activity-region reports for inactive tail, low, mid, high, and active compounds.
 

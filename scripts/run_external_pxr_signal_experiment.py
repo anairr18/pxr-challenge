@@ -16,7 +16,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         description=(
             "Test a genuinely independent public ChEMBL human PXR signal against "
-            "the locked Suiren/CheMeleon anchor under nested CV."
+            "the locked molecular-ensemble anchor under nested CV."
         )
     )
     parser.add_argument("--root", type=Path, default=ROOT)

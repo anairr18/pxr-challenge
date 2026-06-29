@@ -35,23 +35,23 @@ def _load_submission(path: Path) -> pd.DataFrame:
     return df[["SMILES", "Molecule Name", "pEC50"]].copy()
 
 
-def _average_chemeleon_seeds(seeds: list[int]) -> pd.DataFrame:
+def _average_graph_seeds(seeds: list[int]) -> pd.DataFrame:
     seed_frames = []
     for seed in seeds:
-        path = SUBMISSIONS / f"chemeleon_multitask_seed{seed}_predictions.csv"
+        path = SUBMISSIONS / f"graph_multitask_seed{seed}_predictions.csv"
         if not path.exists():
             raise FileNotFoundError(
                 "Missing "
-                f"{path}. Add the per-seed CheMeleon CSV or run "
-                "train_chemeleon_multitask_model.py."
+                f"{path}. Add the per-seed graph predictor CSV or run "
+                "train_graph_multitask_predictor.py."
             )
         seed_frames.append(_load_submission(path))
 
     base = seed_frames[0][["SMILES", "Molecule Name"]].copy()
     base["pEC50"] = np.mean([df["pEC50"].to_numpy(float) for df in seed_frames], axis=0)
-    out = SUBMISSIONS / "chemeleon_multitask_three_seed_predictions.csv"
+    out = SUBMISSIONS / "graph_multitask_ensemble_predictions.csv"
     base.to_csv(out, index=False)
-    print(f"Saved CheMeleon seed average: {out}")
+    print(f"Saved graph predictor seed average: {out}")
     return base
 
 
@@ -74,9 +74,16 @@ def _score_phase1(sub: pd.DataFrame) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Build Suiren/CheMeleon ensemble submission CSV."
+        description="Build molecular ensemble submission CSV."
     )
-    parser.add_argument("--w-cm", type=float, default=0.325, help="CheMeleon blend weight.")
+    parser.add_argument(
+        "--w-graph",
+        "--w-cm",
+        dest="w_graph",
+        type=float,
+        default=0.325,
+        help="Graph predictor blend weight.",
+    )
     parser.add_argument("--seeds", type=int, nargs="+", default=[0, 1, 2])
     parser.add_argument("--evaluate", action="store_true")
     parser.add_argument("--clip-min", type=float, default=PRED_MIN)
@@ -84,24 +91,28 @@ def main() -> None:
     args = parser.parse_args()
 
     SUBMISSIONS.mkdir(parents=True, exist_ok=True)
-    suiren_path = SUBMISSIONS / "suiren_inactive_tail_weighted_three_seed_predictions.csv"
-    suiren = _load_submission(suiren_path).set_index("Molecule Name")
-    chemeleon = _average_chemeleon_seeds(args.seeds).set_index("Molecule Name")
+    conformation_path = SUBMISSIONS / "conformation_predictor_predictions.csv"
+    conformation = _load_submission(conformation_path).set_index("Molecule Name")
+    graph = _average_graph_seeds(args.seeds).set_index("Molecule Name")
 
-    common = suiren.index.intersection(chemeleon.index)
-    if len(common) != len(suiren):
+    common = conformation.index.intersection(graph.index)
+    if len(common) != len(conformation):
         raise ValueError(
-            f"Suiren and CheMeleon molecule sets differ: common={len(common)}, suiren={len(suiren)}"
+            "Conformation and graph predictor molecule sets differ: "
+            f"common={len(common)}, conformation={len(conformation)}"
         )
 
-    w = float(args.w_cm)
-    pred = w * chemeleon.loc[suiren.index, "pEC50"].to_numpy(float)
-    pred += (1.0 - w) * suiren["pEC50"].to_numpy(float)
+    w = float(args.w_graph)
+    pred = w * graph.loc[conformation.index, "pEC50"].to_numpy(float)
+    pred += (1.0 - w) * conformation["pEC50"].to_numpy(float)
     pred = np.clip(pred, args.clip_min, args.clip_max)
 
-    out = suiren[["SMILES"]].reset_index()[["SMILES", "Molecule Name"]]
+    out = conformation[["SMILES"]].reset_index()[["SMILES", "Molecule Name"]]
     out["pEC50"] = pred
-    out_path = SUBMISSIONS / f"suiren_chemeleon_blend_weight_{_weight_label(w)}_predictions.csv"
+    if abs(w - 0.325) < 1e-12:
+        out_path = SUBMISSIONS / "activity_predictions_clean_baseline.csv"
+    else:
+        out_path = SUBMISSIONS / f"molecular_ensemble_weight_{_weight_label(w)}_predictions.csv"
     out.to_csv(out_path, index=False)
     print(f"Saved ensemble: {out_path}")
 

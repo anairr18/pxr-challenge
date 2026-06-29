@@ -15,7 +15,7 @@ def main() -> None:
     parser.add_argument(
         "--out",
         type=Path,
-        default=ROOT / "submissions" / "openadmet_pxr_activity_final_submission.csv",
+        default=ROOT / "submissions" / "activity_predictions_final.csv",
     )
     args = parser.parse_args()
 

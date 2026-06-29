@@ -1,6 +1,6 @@
 [
   {
-    "file": "guarded_residual_calibrated_submission_duplicate.csv",
+    "file": "residual_calibrated_submission_backup.csv",
     "rows": 513,
     "cols": [
       "SMILES",
@@ -39,7 +39,7 @@
     "pEC50_std": 0.8661426145107587
   },
   {
-    "file": "chemeleon_multitask_three_seed_predictions.csv",
+    "file": "graph_multitask_ensemble_predictions.csv",
     "rows": 513,
     "cols": [
       "SMILES",
@@ -52,7 +52,7 @@
     "pEC50_std": 0.7336514614928012
   },
   {
-    "file": "chemeleon_multitask_seed0_predictions.csv",
+    "file": "graph_multitask_seed0_predictions.csv",
     "rows": 513,
     "cols": [
       "SMILES",
@@ -65,7 +65,7 @@
     "pEC50_std": 0.7324210771849615
   },
   {
-    "file": "chemeleon_multitask_seed1_predictions.csv",
+    "file": "graph_multitask_seed1_predictions.csv",
     "rows": 513,
     "cols": [
       "SMILES",
@@ -78,7 +78,7 @@
     "pEC50_std": 0.7513865544820437
   },
   {
-    "file": "chemeleon_multitask_seed2_predictions.csv",
+    "file": "graph_multitask_seed2_predictions.csv",
     "rows": 513,
     "cols": [
       "SMILES",
@@ -91,7 +91,7 @@
     "pEC50_std": 0.7316719913961359
   },
   {
-    "file": "suiren_chemeleon_blend_weight_0p200_predictions.csv",
+    "file": "molecular_ensemble_weight_0p200_predictions.csv",
     "rows": 513,
     "cols": [
       "SMILES",
@@ -104,7 +104,7 @@
     "pEC50_std": 0.6640184096973162
   },
   {
-    "file": "suiren_chemeleon_blend_weight_0p250_predictions.csv",
+    "file": "molecular_ensemble_weight_0p250_predictions.csv",
     "rows": 513,
     "cols": [
       "SMILES",
@@ -117,7 +117,7 @@
     "pEC50_std": 0.6631835865474749
   },
   {
-    "file": "suiren_chemeleon_blend_weight_0p300_predictions.csv",
+    "file": "molecular_ensemble_weight_0p300_predictions.csv",
     "rows": 513,
     "cols": [
       "SMILES",
@@ -130,7 +130,7 @@
     "pEC50_std": 0.663071078037316
   },
   {
-    "file": "suiren_chemeleon_blend_weight_0p325_predictions.csv",
+    "file": "activity_predictions_clean_baseline.csv",
     "rows": 513,
     "cols": [
       "SMILES",
@@ -143,7 +143,7 @@
     "pEC50_std": 0.6632858988150085
   },
   {
-    "file": "suiren_chemeleon_blend_weight_0p350_predictions.csv",
+    "file": "molecular_ensemble_weight_0p350_predictions.csv",
     "rows": 513,
     "cols": [
       "SMILES",
@@ -156,7 +156,7 @@
     "pEC50_std": 0.6636812515114032
   },
   {
-    "file": "suiren_chemeleon_blend_weight_0p400_predictions.csv",
+    "file": "molecular_ensemble_weight_0p400_predictions.csv",
     "rows": 513,
     "cols": [
       "SMILES",
@@ -169,7 +169,7 @@
     "pEC50_std": 0.6650121177095143
   },
   {
-    "file": "suiren_inactive_tail_weighted_three_seed_predictions.csv",
+    "file": "conformation_predictor_predictions.csv",
     "rows": 513,
     "cols": [
       "SMILES",
@@ -278,7 +278,7 @@
     "pEC50_std": 1.1204129787751018
   },
   {
-    "file": "guarded_residual_calibrated_submission.csv",
+    "file": "residual_calibrated_submission.csv",
     "rows": 513,
     "cols": [
       "SMILES",

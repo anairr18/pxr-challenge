@@ -1,13 +1,13 @@
 {
   "project": "OpenADMET PXR",
-  "final_upload_submission": "openadmet_pxr_activity_final_submission.csv",
-  "final_upload_source": "guarded_residual_calibrated_submission.csv",
+  "final_upload_submission": "activity_predictions_final.csv",
+  "final_upload_source": "residual_calibrated_submission.csv",
   "final_upload_nested_cv_estimate": {
     "mae": 0.424,
     "rae": 0.559,
     "note": "Guarded residual-calibrated model; do not direct-score exact-filled Phase 1 rows."
   },
-  "honest_best_submission": "suiren_chemeleon_blend_weight_0p325_predictions.csv",
+  "honest_best_submission": "activity_predictions_clean_baseline.csv",
   "current_honest_phase1_mae": 0.437332,
   "current_honest_phase1_rae_fixed_denom": 0.577259,
   "bootstrap": {
@@ -21,16 +21,16 @@
     "required_columns": ["SMILES", "Molecule Name", "pEC50"]
   },
   "candidate_pool": [
-    "suiren_inactive_tail_weighted_three_seed_predictions.csv",
-    "suiren_chemeleon_blend_weight_0p200_predictions.csv",
-    "suiren_chemeleon_blend_weight_0p250_predictions.csv",
-    "suiren_chemeleon_blend_weight_0p300_predictions.csv",
-    "suiren_chemeleon_blend_weight_0p325_predictions.csv",
-    "suiren_chemeleon_blend_weight_0p350_predictions.csv",
-    "suiren_chemeleon_blend_weight_0p400_predictions.csv",
-    "chemeleon_multitask_seed0_predictions.csv",
-    "chemeleon_multitask_seed1_predictions.csv",
-    "chemeleon_multitask_seed2_predictions.csv",
-    "chemeleon_multitask_three_seed_predictions.csv"
+    "conformation_predictor_predictions.csv",
+    "molecular_ensemble_weight_0p200_predictions.csv",
+    "molecular_ensemble_weight_0p250_predictions.csv",
+    "molecular_ensemble_weight_0p300_predictions.csv",
+    "activity_predictions_clean_baseline.csv",
+    "molecular_ensemble_weight_0p350_predictions.csv",
+    "molecular_ensemble_weight_0p400_predictions.csv",
+    "graph_multitask_seed0_predictions.csv",
+    "graph_multitask_seed1_predictions.csv",
+    "graph_multitask_seed2_predictions.csv",
+    "graph_multitask_ensemble_predictions.csv"
   ]
 }

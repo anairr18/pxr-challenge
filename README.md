@@ -1,4 +1,4 @@
-# OpenADMET PXR - Leakage-Aware Suiren/CheMeleon Ensemble
+# OpenADMET PXR Activity Prediction
 
 This repository is structured after the reference OpenADMET PXR challenge repo:
 
@@ -9,34 +9,27 @@ This repository is structured after the reference OpenADMET PXR challenge repo:
 - `reports/`
 
 The modeling story is intentionally honest-first: the main submission is built
-around a Suiren/CheMeleon neural ensemble, with optional guarded residual
-calibration and a strict audit layer that rejects exact-filled Phase 1 files.
+around a complementary molecular ensemble with guarded residual calibration and
+a strict audit layer that rejects exact-filled Phase 1 files for direct scoring.
 
 ## Final Submission Recommendation
 
 The file I would upload to the activity track is:
 
 ```text
-submissions/openadmet_pxr_activity_final_submission.csv
+submissions/activity_predictions_final.csv
 ```
 
-This is a canonical copy of:
-
-```text
-submissions/guarded_residual_calibrated_submission.csv
-```
-
-`guarded_residual_calibrated_submission.csv` and
-`guarded_residual_calibrated_submission_duplicate.csv` are byte-for-byte
-identical in this repo. The guarded file is exact-filled on the 253 revealed
-Phase 1 rows, so it is not valid for direct honest Phase 1 scoring, but it is
-the best supported upload candidate because its residual-calibrated hidden/test
-predictions are backed by the nested-CV diagnostic.
+This is the canonical final upload candidate. The final file is exact-filled on
+the 253 revealed Phase 1 rows, so it is not valid for direct honest Phase 1
+scoring, but it is the best supported upload candidate because its
+residual-calibrated hidden/test predictions are backed by the nested-CV
+diagnostic.
 
 The best clean non-exact baseline from direct Phase 1 audit is:
 
 ```text
-submissions/suiren_chemeleon_blend_weight_0p325_predictions.csv
+submissions/activity_predictions_clean_baseline.csv
 ```
 
 Its honest direct Phase 1 audit result is:
@@ -55,7 +48,7 @@ RAE ~= 0.559
 ```
 
 So the clean blend is the baseline evidence, while
-`openadmet_pxr_activity_final_submission.csv` is the final upload file.
+`activity_predictions_final.csv` is the final upload file.
 
 ## Repository Layout
 
@@ -68,22 +61,22 @@ openadmet_pxr_submission_repo/
     README.md
   models/
     README.md
-    suiren/
+    conformation_predictor/
       README.md
       weights/
         README.md
   reports/
     writeup.md
   scripts/
-    assemble_neural_ensemble.py
+    build_molecular_ensemble.py
     create_phase1_cross_validation_splits.py
     enumerate_matched_molecular_pairs.py
     prepare_final_submission.py
     run_cross_validation_audit.py
     run_phase1_honest_audit.py
     select_best_submission_candidate.py
-    train_chemeleon_multitask_model.py
-    train_suiren_inactive_tail_weighted_model.py
+    train_conformation_predictor.py
+    train_graph_multitask_predictor.py
   src/openadmet_pxr_repo/
     audit.py
     io.py
@@ -91,7 +84,7 @@ openadmet_pxr_submission_repo/
     selection.py
   submissions/
     README.md
-    openadmet_pxr_activity_final_submission.csv
+    activity_predictions_final.csv
   weights/
     ensemble_manifest.json
 ```
@@ -100,17 +93,18 @@ openadmet_pxr_submission_repo/
 
 The core ensemble combines:
 
-- **Suiren inactive-tail weighted model**: the conformation-aware / graph-based
-  component represented by
-  `suiren_inactive_tail_weighted_three_seed_predictions.csv`.
-- **CheMeleon**: Chemprop/CheMeleon-style molecular graph neural predictions,
-  averaged over seeds when available.
-- **Blend**: `pEC50 = w * CheMeleon + (1 - w) * Suiren`, with `w=0.325` as the
-  current clean candidate from the bundle audit.
+- a conformation-aware molecular predictor
+- a graph-based multitask molecular predictor
+- a conservative residual-calibration layer selected under nested validation
+
+The clean baseline file in `submissions/activity_predictions_clean_baseline.csv`
+is the direct Phase 1 audit reference. The final upload file in
+`submissions/activity_predictions_final.csv` is the guarded submission candidate.
 
 Counter-assay and multitask signals were tested as auxiliary biological context.
 Tree models such as LightGBM, XGBoost, and ExtraTrees were useful only as
-guarded residual correctors, not as standalone replacements for the neural core.
+guarded residual correctors, not as standalone replacements for the molecular
+ensemble.
 
 ## Environment Setup
 
@@ -126,11 +120,12 @@ If you use `uv`, the lightweight project file is included:
 uv sync
 ```
 
-Large model checkpoints are not committed. Put them under:
+Large model checkpoints are not committed. Put them under the corresponding
+model directories if reproducing training:
 
 ```text
-models/suiren/weights/
-~/.chemprop/chemeleon_mp.pt
+models/
+~/.chemprop/
 ```
 
 ## Reproducing the Submission Shape
@@ -140,7 +135,7 @@ models/suiren/weights/
 3. Build the ensemble:
 
 ```bash
-python scripts/assemble_neural_ensemble.py --w-cm 0.325 --evaluate
+python scripts/build_molecular_ensemble.py --w-graph 0.325 --evaluate
 ```
 
 4. Run the honest audit:
@@ -158,19 +153,19 @@ python scripts/select_best_submission_candidate.py --root .
 ## Honest Sub-0.40 Experiment Gate
 
 The repo includes an experimental structure/assay residual stack for testing
-whether a new independent signal can beat the Suiren/CheMeleon anchor without
-overfitting the 253 revealed Phase 1 rows.
+whether a new independent signal can beat the clean molecular-ensemble anchor
+without overfitting the 253 revealed Phase 1 rows.
 
 Run it only in an environment with RDKit and scikit-learn installed:
 
 ```bash
-python scripts/run_sub040_signal_experiment.py --root . --n-boot 5000
+python scripts/run_structure_assay_signal_experiment.py --root . --n-boot 5000
 ```
 
 Optional, slower 3D descriptor mode:
 
 ```bash
-python scripts/run_sub040_signal_experiment.py --root . --with-3d --n-boot 5000
+python scripts/run_structure_assay_signal_experiment.py --root . --with-3d --n-boot 5000
 ```
 
 This command writes:
@@ -183,14 +178,14 @@ This command writes:
 - `submissions/structure_assay_residual_upload_candidate.csv`
 
 The experiment deliberately does **not** replace
-`submissions/openadmet_pxr_activity_final_submission.csv`. A new candidate is
+`submissions/activity_predictions_final.csv`. A new candidate is
 eligible for replacement only if the nested-CV acceptance gate passes.
 
 ## Genuinely Independent Signal Test
 
-Most prior additions were not independent enough: RDKit trees, UniMol,
-ChemBERTa, counter-assay residuals, and tail gates were all either weak,
-over-correlated with the Suiren/CheMeleon anchor, or unstable across folds.
+Most prior additions were not independent enough: descriptor trees,
+representation extensions, counter-assay residuals, and tail gates were all
+either weak, over-correlated with the clean anchor, or unstable across folds.
 
 The strongest next independent signal is public human PXR pharmacology from
 ChEMBL target `CHEMBL3401` / NR1I2. This is not trained from the OCNT challenge
@@ -212,8 +207,8 @@ This writes:
 - `submissions/external_chembl_pxr_signal_upload_candidate.csv`
 
 The upload candidate is experimental. Keep
-`submissions/openadmet_pxr_activity_final_submission.csv` locked unless the
-external-signal report returns a review-for-replacement decision.
+`submissions/activity_predictions_final.csv` locked unless the external-signal
+report returns a review-for-replacement decision.
 
 ## Honest Metric Policy
 

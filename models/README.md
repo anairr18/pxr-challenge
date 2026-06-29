@@ -7,11 +7,11 @@ default.
 
 Expected optional paths:
 
-- `models/suiren/weights/model.pt`
-- `models/suiren/repo/`
+- `models/conformation_predictor/weights/model.pt`
+- `models/conformation_predictor/repo/`
 
-CheMeleon foundation weights are usually cached outside the repo at:
+Graph multitask predictor weights are usually cached outside the repo at:
 
 ```text
-~/.chemprop/chemeleon_mp.pt
+~/.chemprop/
 ```
