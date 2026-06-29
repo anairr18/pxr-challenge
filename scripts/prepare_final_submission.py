@@ -10,18 +10,22 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Run honest Phase 1 audit as the CV gate.")
+    parser = argparse.ArgumentParser(description="Select final non-contaminated candidate.")
     parser.add_argument("--root", type=Path, default=ROOT)
-    parser.add_argument("--n-boot", type=int, default=5000)
+    parser.add_argument(
+        "--out",
+        type=Path,
+        default=ROOT / "submissions" / "openadmet_pxr_activity_final_submission.csv",
+    )
     args = parser.parse_args()
 
     cmd = [
         sys.executable,
-        str(ROOT / "scripts" / "run_honest_audit.py"),
+        str(ROOT / "scripts" / "select_best_submission_candidate.py"),
         "--root",
         str(args.root),
-        "--n-boot",
-        str(args.n_boot),
+        "--out",
+        str(args.out),
     ]
     raise SystemExit(subprocess.call(cmd))
 

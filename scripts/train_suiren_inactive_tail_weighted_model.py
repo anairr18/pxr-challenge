@@ -15,7 +15,7 @@ def main() -> None:
     parser.add_argument("--skip-training", action="store_true")
     args = parser.parse_args()
 
-    out = ROOT / "submissions" / "iw2_3seed_ep17-23.csv"
+    out = ROOT / "submissions" / "suiren_inactive_tail_weighted_three_seed_predictions.csv"
     print("Suiren training/inference requires the Suiren code and pretrained checkpoint.")
     print("Seeds:", args.seeds)
     print("Skip training:", args.skip_training)

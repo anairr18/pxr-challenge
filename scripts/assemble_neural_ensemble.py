@@ -20,6 +20,10 @@ PRED_MIN = 1.0
 PRED_MAX = 8.5
 
 
+def _weight_label(weight: float) -> str:
+    return f"{weight:.3f}".replace(".", "p")
+
+
 def _load_submission(path: Path) -> pd.DataFrame:
     if not path.exists():
         raise FileNotFoundError(path)
@@ -34,16 +38,18 @@ def _load_submission(path: Path) -> pd.DataFrame:
 def _average_chemeleon_seeds(seeds: list[int]) -> pd.DataFrame:
     seed_frames = []
     for seed in seeds:
-        path = SUBMISSIONS / f"chemeleon_mt_lr3e-04_s{seed}.csv"
+        path = SUBMISSIONS / f"chemeleon_multitask_seed{seed}_predictions.csv"
         if not path.exists():
             raise FileNotFoundError(
-                f"Missing {path}. Add the per-seed CheMeleon CSV or run train_chemeleon.py."
+                "Missing "
+                f"{path}. Add the per-seed CheMeleon CSV or run "
+                "train_chemeleon_multitask_model.py."
             )
         seed_frames.append(_load_submission(path))
 
     base = seed_frames[0][["SMILES", "Molecule Name"]].copy()
     base["pEC50"] = np.mean([df["pEC50"].to_numpy(float) for df in seed_frames], axis=0)
-    out = SUBMISSIONS / f"chemeleon_mt_lr3e-04_{len(seeds)}seed.csv"
+    out = SUBMISSIONS / "chemeleon_multitask_three_seed_predictions.csv"
     base.to_csv(out, index=False)
     print(f"Saved CheMeleon seed average: {out}")
     return base
@@ -78,7 +84,7 @@ def main() -> None:
     args = parser.parse_args()
 
     SUBMISSIONS.mkdir(parents=True, exist_ok=True)
-    suiren_path = SUBMISSIONS / "iw2_3seed_ep17-23.csv"
+    suiren_path = SUBMISSIONS / "suiren_inactive_tail_weighted_three_seed_predictions.csv"
     suiren = _load_submission(suiren_path).set_index("Molecule Name")
     chemeleon = _average_chemeleon_seeds(args.seeds).set_index("Molecule Name")
 
@@ -95,7 +101,7 @@ def main() -> None:
 
     out = suiren[["SMILES"]].reset_index()[["SMILES", "Molecule Name"]]
     out["pEC50"] = pred
-    out_path = SUBMISSIONS / f"ens_cm_lr3e-04_3seed_sur_w{w:.3f}.csv"
+    out_path = SUBMISSIONS / f"suiren_chemeleon_blend_weight_{_weight_label(w)}_predictions.csv"
     out.to_csv(out_path, index=False)
     print(f"Saved ensemble: {out_path}")
 

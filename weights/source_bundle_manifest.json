@@ -1,0 +1,112 @@
+{
+  "copied": [
+    {
+      "name": "pxr-challenge_TRAIN.csv",
+      "src": "/content/data/pxr-challenge_TRAIN.csv",
+      "bytes": 858677
+    },
+    {
+      "name": "pxr-challenge_TEST_BLINDED.csv",
+      "src": "/content/data/pxr-challenge_TEST_BLINDED.csv",
+      "bytes": 31805
+    },
+    {
+      "name": "phase1_unblinded.csv",
+      "src": "/content/data/phase1_unblinded.csv",
+      "bytes": 17426
+    },
+    {
+      "name": "multitask_train.csv",
+      "src": "/content/data/multitask_train.csv",
+      "bytes": 576482
+    },
+    {
+      "name": "pxr-challenge_counter-assay_TRAIN.csv",
+      "src": "/content/data/pxr-challenge_counter-assay_TRAIN.csv",
+      "bytes": 598132
+    },
+    {
+      "name": "suiren_inactive_tail_weighted_three_seed_predictions.csv",
+      "src": "/content/submissions/suiren_inactive_tail_weighted_three_seed_predictions.csv",
+      "bytes": 41061
+    },
+    {
+      "name": "chemeleon_multitask_seed0_predictions.csv",
+      "src": "/content/submissions/chemeleon_multitask_seed0_predictions.csv",
+      "bytes": 36676
+    },
+    {
+      "name": "chemeleon_multitask_seed1_predictions.csv",
+      "src": "/content/submissions/chemeleon_multitask_seed1_predictions.csv",
+      "bytes": 36693
+    },
+    {
+      "name": "chemeleon_multitask_seed2_predictions.csv",
+      "src": "/content/submissions/chemeleon_multitask_seed2_predictions.csv",
+      "bytes": 36663
+    },
+    {
+      "name": "chemeleon_multitask_three_seed_predictions.csv",
+      "src": "/content/submissions/chemeleon_multitask_three_seed_predictions.csv",
+      "bytes": 40346
+    },
+    {
+      "name": "guarded_residual_calibrated_submission_duplicate.csv",
+      "src": "/content/submissions/guarded_residual_calibrated_submission_duplicate.csv",
+      "bytes": 38426
+    },
+    {
+      "name": "auxiliary_residual_guarded_submission.csv",
+      "src": "/content/submissions/auxiliary_residual_guarded_submission.csv",
+      "bytes": 38413
+    },
+    {
+      "name": "auxiliary_residual_high_upside_submission.csv",
+      "src": "/content/submissions/auxiliary_residual_high_upside_submission.csv",
+      "bytes": 38425
+    },
+    {
+      "name": "suiren_chemeleon_blend_weight_0p300_predictions.csv",
+      "src": "/content/scripts/suiren_chemeleon_blend_weight_0p300_predictions.csv",
+      "bytes": 41079
+    },
+    {
+      "name": "suiren_chemeleon_blend_weight_0p400_predictions.csv",
+      "src": "/content/submissions/suiren_chemeleon_blend_weight_0p400_predictions.csv",
+      "bytes": 41069
+    },
+    {
+      "name": "suiren_chemeleon_blend_weight_0p350_predictions.csv",
+      "src": "/content/submissions/suiren_chemeleon_blend_weight_0p350_predictions.csv",
+      "bytes": 41073
+    },
+    {
+      "name": "suiren_chemeleon_blend_weight_0p325_predictions.csv",
+      "src": "/content/submissions/suiren_chemeleon_blend_weight_0p325_predictions.csv",
+      "bytes": 41082
+    },
+    {
+      "name": "suiren_chemeleon_blend_weight_0p200_predictions.csv",
+      "src": "/content/submissions/suiren_chemeleon_blend_weight_0p200_predictions.csv",
+      "bytes": 41079
+    },
+    {
+      "name": "suiren_chemeleon_blend_weight_0p250_predictions.csv",
+      "src": "/content/submissions/suiren_chemeleon_blend_weight_0p250_predictions.csv",
+      "bytes": 41070
+    },
+    {
+      "name": "guarded_residual_calibrated_submission.csv",
+      "src": "/content/submissions/guarded_residual_calibrated_submission.csv",
+      "bytes": 38426
+    }
+  ],
+  "missing_exact": [
+    "suiren_chemeleon_single_seed_blend_weight_0p300_predictions.csv",
+    "suiren_chemeleon_single_seed_blend_weight_0p300_auto_predictions.csv",
+    "counter_multitask_suiren_chemeleon_blend_weight_0p300_predictions.csv",
+    "counter_multitask_suiren_chemeleon_blend_weight_0p325_phase1_selected_predictions.csv",
+    "cross_validated_residual_calibrated_core_predictions.csv"
+  ],
+  "skipped": []
+}

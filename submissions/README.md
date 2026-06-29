@@ -7,10 +7,10 @@ Place final CSV / parquet submission files here.
 Use:
 
 ```text
-submission_activity_phase2.csv
+openadmet_pxr_activity_final_submission.csv
 ```
 
-This is a copy of `rank1_tail_active_guarded.csv`.
+This is a copy of `guarded_residual_calibrated_submission.csv`.
 
 Why this file:
 
@@ -28,7 +28,7 @@ Typical outputs from the audit and selection scripts:
 
 - `phase1_honest_metrics_report.csv`
 - `best_honest_submission.csv`
-- `final_submission.csv`
+- `openadmet_pxr_activity_final_submission.csv`
 
 The audit script will also print which files were skipped as contaminated exact-filled
 Phase 1 candidates.

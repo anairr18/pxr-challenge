@@ -16,7 +16,7 @@ def main() -> None:
     parser.add_argument("--epochs", type=int, default=25)
     args = parser.parse_args()
 
-    out = ROOT / "submissions" / f"chemeleon_mt_lr3e-04_s{args.seed}.csv"
+    out = ROOT / "submissions" / f"chemeleon_multitask_seed{args.seed}_predictions.csv"
     print("CheMeleon training requires the full Chemprop/CheMeleon environment and checkpoint.")
     print("Expected output path:", out)
     print("This lightweight repo keeps the same entry point as the reference repo.")

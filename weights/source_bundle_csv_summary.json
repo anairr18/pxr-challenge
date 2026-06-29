@@ -1,6 +1,6 @@
 [
   {
-    "file": "MOONSHOT_FINAL_RECOMMENDED.csv",
+    "file": "guarded_residual_calibrated_submission_duplicate.csv",
     "rows": 513,
     "cols": [
       "SMILES",
@@ -13,7 +13,7 @@
     "pEC50_std": 0.8741412856035314
   },
   {
-    "file": "big_push_guarded_aux_residual.csv",
+    "file": "auxiliary_residual_guarded_submission.csv",
     "rows": 513,
     "cols": [
       "SMILES",
@@ -26,7 +26,7 @@
     "pEC50_std": 0.8642183928505004
   },
   {
-    "file": "big_push_high_upside_aux_residual.csv",
+    "file": "auxiliary_residual_high_upside_submission.csv",
     "rows": 513,
     "cols": [
       "SMILES",
@@ -39,7 +39,7 @@
     "pEC50_std": 0.8661426145107587
   },
   {
-    "file": "chemeleon_mt_lr3e-04_3seed.csv",
+    "file": "chemeleon_multitask_three_seed_predictions.csv",
     "rows": 513,
     "cols": [
       "SMILES",
@@ -52,7 +52,7 @@
     "pEC50_std": 0.7336514614928012
   },
   {
-    "file": "chemeleon_mt_lr3e-04_s0.csv",
+    "file": "chemeleon_multitask_seed0_predictions.csv",
     "rows": 513,
     "cols": [
       "SMILES",
@@ -65,7 +65,7 @@
     "pEC50_std": 0.7324210771849615
   },
   {
-    "file": "chemeleon_mt_lr3e-04_s1.csv",
+    "file": "chemeleon_multitask_seed1_predictions.csv",
     "rows": 513,
     "cols": [
       "SMILES",
@@ -78,7 +78,7 @@
     "pEC50_std": 0.7513865544820437
   },
   {
-    "file": "chemeleon_mt_lr3e-04_s2.csv",
+    "file": "chemeleon_multitask_seed2_predictions.csv",
     "rows": 513,
     "cols": [
       "SMILES",
@@ -91,7 +91,7 @@
     "pEC50_std": 0.7316719913961359
   },
   {
-    "file": "ens_cm_lr3e-04_3seed_sur_w0.200.csv",
+    "file": "suiren_chemeleon_blend_weight_0p200_predictions.csv",
     "rows": 513,
     "cols": [
       "SMILES",
@@ -104,7 +104,7 @@
     "pEC50_std": 0.6640184096973162
   },
   {
-    "file": "ens_cm_lr3e-04_3seed_sur_w0.250.csv",
+    "file": "suiren_chemeleon_blend_weight_0p250_predictions.csv",
     "rows": 513,
     "cols": [
       "SMILES",
@@ -117,7 +117,7 @@
     "pEC50_std": 0.6631835865474749
   },
   {
-    "file": "ens_cm_lr3e-04_3seed_sur_w0.300.csv",
+    "file": "suiren_chemeleon_blend_weight_0p300_predictions.csv",
     "rows": 513,
     "cols": [
       "SMILES",
@@ -130,7 +130,7 @@
     "pEC50_std": 0.663071078037316
   },
   {
-    "file": "ens_cm_lr3e-04_3seed_sur_w0.325.csv",
+    "file": "suiren_chemeleon_blend_weight_0p325_predictions.csv",
     "rows": 513,
     "cols": [
       "SMILES",
@@ -143,7 +143,7 @@
     "pEC50_std": 0.6632858988150085
   },
   {
-    "file": "ens_cm_lr3e-04_3seed_sur_w0.350.csv",
+    "file": "suiren_chemeleon_blend_weight_0p350_predictions.csv",
     "rows": 513,
     "cols": [
       "SMILES",
@@ -156,7 +156,7 @@
     "pEC50_std": 0.6636812515114032
   },
   {
-    "file": "ens_cm_lr3e-04_3seed_sur_w0.400.csv",
+    "file": "suiren_chemeleon_blend_weight_0p400_predictions.csv",
     "rows": 513,
     "cols": [
       "SMILES",
@@ -169,7 +169,7 @@
     "pEC50_std": 0.6650121177095143
   },
   {
-    "file": "iw2_3seed_ep17-23.csv",
+    "file": "suiren_inactive_tail_weighted_three_seed_predictions.csv",
     "rows": 513,
     "cols": [
       "SMILES",
@@ -278,7 +278,7 @@
     "pEC50_std": 1.1204129787751018
   },
   {
-    "file": "rank1_tail_active_guarded.csv",
+    "file": "guarded_residual_calibrated_submission.csv",
     "rows": 513,
     "cols": [
       "SMILES",

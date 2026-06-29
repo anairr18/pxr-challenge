@@ -1,13 +1,13 @@
 {
   "project": "OpenADMET PXR",
-  "final_upload_submission": "submission_activity_phase2.csv",
-  "final_upload_source": "rank1_tail_active_guarded.csv",
+  "final_upload_submission": "openadmet_pxr_activity_final_submission.csv",
+  "final_upload_source": "guarded_residual_calibrated_submission.csv",
   "final_upload_nested_cv_estimate": {
     "mae": 0.424,
     "rae": 0.559,
     "note": "Guarded residual-calibrated model; do not direct-score exact-filled Phase 1 rows."
   },
-  "honest_best_submission": "ens_cm_lr3e-04_3seed_sur_w0.325.csv",
+  "honest_best_submission": "suiren_chemeleon_blend_weight_0p325_predictions.csv",
   "current_honest_phase1_mae": 0.437332,
   "current_honest_phase1_rae_fixed_denom": 0.577259,
   "bootstrap": {
@@ -21,16 +21,16 @@
     "required_columns": ["SMILES", "Molecule Name", "pEC50"]
   },
   "candidate_pool": [
-    "iw2_3seed_ep17-23.csv",
-    "ens_cm_lr3e-04_3seed_sur_w0.200.csv",
-    "ens_cm_lr3e-04_3seed_sur_w0.250.csv",
-    "ens_cm_lr3e-04_3seed_sur_w0.300.csv",
-    "ens_cm_lr3e-04_3seed_sur_w0.325.csv",
-    "ens_cm_lr3e-04_3seed_sur_w0.350.csv",
-    "ens_cm_lr3e-04_3seed_sur_w0.400.csv",
-    "chemeleon_mt_lr3e-04_s0.csv",
-    "chemeleon_mt_lr3e-04_s1.csv",
-    "chemeleon_mt_lr3e-04_s2.csv",
-    "chemeleon_mt_lr3e-04_3seed.csv"
+    "suiren_inactive_tail_weighted_three_seed_predictions.csv",
+    "suiren_chemeleon_blend_weight_0p200_predictions.csv",
+    "suiren_chemeleon_blend_weight_0p250_predictions.csv",
+    "suiren_chemeleon_blend_weight_0p300_predictions.csv",
+    "suiren_chemeleon_blend_weight_0p325_predictions.csv",
+    "suiren_chemeleon_blend_weight_0p350_predictions.csv",
+    "suiren_chemeleon_blend_weight_0p400_predictions.csv",
+    "chemeleon_multitask_seed0_predictions.csv",
+    "chemeleon_multitask_seed1_predictions.csv",
+    "chemeleon_multitask_seed2_predictions.csv",
+    "chemeleon_multitask_three_seed_predictions.csv"
   ]
 }

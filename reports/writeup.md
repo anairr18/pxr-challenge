@@ -18,17 +18,17 @@ artifacts, but they are excluded from honest ranking.
 - `phase1_unblinded.csv`
 - `pxr-challenge_counter-assay_TRAIN.csv`
 - `multitask_train.csv`
-- `iw2_3seed_ep17-23.csv`
-- `ens_cm_lr3e-04_3seed_sur_w0.200.csv`
-- `ens_cm_lr3e-04_3seed_sur_w0.250.csv`
-- `ens_cm_lr3e-04_3seed_sur_w0.300.csv`
-- `ens_cm_lr3e-04_3seed_sur_w0.325.csv`
-- `ens_cm_lr3e-04_3seed_sur_w0.350.csv`
-- `ens_cm_lr3e-04_3seed_sur_w0.400.csv`
-- `chemeleon_mt_lr3e-04_s0.csv`
-- `chemeleon_mt_lr3e-04_s1.csv`
-- `chemeleon_mt_lr3e-04_s2.csv`
-- `chemeleon_mt_lr3e-04_3seed.csv`
+- `suiren_inactive_tail_weighted_three_seed_predictions.csv`
+- `suiren_chemeleon_blend_weight_0p200_predictions.csv`
+- `suiren_chemeleon_blend_weight_0p250_predictions.csv`
+- `suiren_chemeleon_blend_weight_0p300_predictions.csv`
+- `suiren_chemeleon_blend_weight_0p325_predictions.csv`
+- `suiren_chemeleon_blend_weight_0p350_predictions.csv`
+- `suiren_chemeleon_blend_weight_0p400_predictions.csv`
+- `chemeleon_multitask_seed0_predictions.csv`
+- `chemeleon_multitask_seed1_predictions.csv`
+- `chemeleon_multitask_seed2_predictions.csv`
+- `chemeleon_multitask_three_seed_predictions.csv`
 
 ## Modeling Strategy
 
@@ -62,10 +62,10 @@ That gives a proper uncertainty band for the Phase 1 audit set.
 The following files are useful for formatting or diagnostics, but not for honest
 direct scoring:
 
-- `MOONSHOT_FINAL_RECOMMENDED.csv`
-- `big_push_guarded_aux_residual.csv`
-- `big_push_high_upside_aux_residual.csv`
-- `rank1_tail_active_guarded.csv`
+- `guarded_residual_calibrated_submission_duplicate.csv`
+- `auxiliary_residual_guarded_submission.csv`
+- `auxiliary_residual_high_upside_submission.csv`
+- `guarded_residual_calibrated_submission.csv`
 
 Those files exact-fill the Phase 1 rows and therefore cannot be treated as
 independent measurements.
@@ -74,7 +74,7 @@ independent measurements.
 
 In the current bundle audit, the strongest non-contaminated CSV was:
 
-- `ens_cm_lr3e-04_3seed_sur_w0.325.csv`
+- `suiren_chemeleon_blend_weight_0p325_predictions.csv`
 
 That file is the best honest candidate to carry forward if the goal is a clean
 Phase 1-based comparison.
@@ -90,4 +90,3 @@ Phase 1-based comparison.
 This repo is built to be honest first and aggressive second.
 It gives you a clean, reproducible way to justify the submission choice without
 mixing in contaminated files or overclaiming hidden-score certainty.
-

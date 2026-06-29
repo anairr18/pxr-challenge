@@ -17,25 +17,26 @@ calibration and a strict audit layer that rejects exact-filled Phase 1 files.
 The file I would upload to the activity track is:
 
 ```text
-submissions/submission_activity_phase2.csv
+submissions/openadmet_pxr_activity_final_submission.csv
 ```
 
 This is a canonical copy of:
 
 ```text
-submissions/rank1_tail_active_guarded.csv
+submissions/guarded_residual_calibrated_submission.csv
 ```
 
-`rank1_tail_active_guarded.csv` and `MOONSHOT_FINAL_RECOMMENDED.csv` are
-byte-for-byte identical in this repo. The guarded file is exact-filled on the
-253 revealed Phase 1 rows, so it is not valid for direct honest Phase 1 scoring,
-but it is the best supported upload candidate because its residual-calibrated
-hidden/test predictions are backed by the nested-CV diagnostic.
+`guarded_residual_calibrated_submission.csv` and
+`guarded_residual_calibrated_submission_duplicate.csv` are byte-for-byte
+identical in this repo. The guarded file is exact-filled on the 253 revealed
+Phase 1 rows, so it is not valid for direct honest Phase 1 scoring, but it is
+the best supported upload candidate because its residual-calibrated hidden/test
+predictions are backed by the nested-CV diagnostic.
 
 The best clean non-exact baseline from direct Phase 1 audit is:
 
 ```text
-submissions/ens_cm_lr3e-04_3seed_sur_w0.325.csv
+submissions/suiren_chemeleon_blend_weight_0p325_predictions.csv
 ```
 
 Its honest direct Phase 1 audit result is:
@@ -54,7 +55,7 @@ RAE ~= 0.559
 ```
 
 So the clean blend is the baseline evidence, while
-`submission_activity_phase2.csv` is the final upload file.
+`openadmet_pxr_activity_final_submission.csv` is the final upload file.
 
 ## Repository Layout
 
@@ -74,15 +75,15 @@ openadmet_pxr_submission_repo/
   reports/
     writeup.md
   scripts/
-    build_ensemble.py
-    enumerate_mmps.py
-    make_cv_splits.py
-    run_honest_audit.py
-    select_best_candidate.py
-    train_chemeleon.py
-    train_cv.py
-    train_final.py
-    train_inactive_weight.py
+    assemble_neural_ensemble.py
+    create_phase1_cross_validation_splits.py
+    enumerate_matched_molecular_pairs.py
+    prepare_final_submission.py
+    run_cross_validation_audit.py
+    run_phase1_honest_audit.py
+    select_best_submission_candidate.py
+    train_chemeleon_multitask_model.py
+    train_suiren_inactive_tail_weighted_model.py
   src/openadmet_pxr_repo/
     audit.py
     io.py
@@ -90,7 +91,7 @@ openadmet_pxr_submission_repo/
     selection.py
   submissions/
     README.md
-    submission_activity_phase2.csv
+    openadmet_pxr_activity_final_submission.csv
   weights/
     ensemble_manifest.json
 ```
@@ -99,8 +100,9 @@ openadmet_pxr_submission_repo/
 
 The core ensemble combines:
 
-- **Suiren iw2**: the conformation-aware / graph-based component represented by
-  `iw2_3seed_ep17-23.csv`.
+- **Suiren inactive-tail weighted model**: the conformation-aware / graph-based
+  component represented by
+  `suiren_inactive_tail_weighted_three_seed_predictions.csv`.
 - **CheMeleon**: Chemprop/CheMeleon-style molecular graph neural predictions,
   averaged over seeds when available.
 - **Blend**: `pEC50 = w * CheMeleon + (1 - w) * Suiren`, with `w=0.325` as the
@@ -138,19 +140,19 @@ models/suiren/weights/
 3. Build the ensemble:
 
 ```bash
-python scripts/build_ensemble.py --w-cm 0.325 --evaluate
+python scripts/assemble_neural_ensemble.py --w-cm 0.325 --evaluate
 ```
 
 4. Run the honest audit:
 
 ```bash
-python scripts/run_honest_audit.py --root .
+python scripts/run_phase1_honest_audit.py --root .
 ```
 
 5. Select the best non-contaminated candidate:
 
 ```bash
-python scripts/select_best_candidate.py --root .
+python scripts/select_best_submission_candidate.py --root .
 ```
 
 ## Honest Metric Policy
