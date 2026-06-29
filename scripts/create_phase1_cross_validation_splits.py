@@ -2,13 +2,17 @@ from __future__ import annotations
 
 import argparse
 from pathlib import Path
+import sys
 
-import numpy as np
 import pandas as pd
-from sklearn.model_selection import KFold
 
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "src"))
+
+from openadmet_pxr_repo.sub040_signal_experiment import _stratified_scaffold_folds
+
+
 
 
 def main() -> None:
@@ -20,13 +24,12 @@ def main() -> None:
     args = parser.parse_args()
 
     df = pd.read_csv(args.input)
-    if "Molecule Name" not in df.columns:
-        raise ValueError(f"{args.input} must contain 'Molecule Name'")
+    required = {"Molecule Name", "SMILES", "pEC50"}
+    missing = required - set(df.columns)
+    if missing:
+        raise ValueError(f"{args.input} is missing required columns: {sorted(missing)}")
 
-    fold = np.full(len(df), -1, dtype=int)
-    splitter = KFold(n_splits=args.folds, shuffle=True, random_state=args.seed)
-    for fold_id, (_, val_idx) in enumerate(splitter.split(df)):
-        fold[val_idx] = fold_id
+    fold = _stratified_scaffold_folds(df, args.folds, args.seed)
 
     out = df[["Molecule Name"]].copy()
     out["fold"] = fold

@@ -155,6 +155,37 @@ python scripts/run_phase1_honest_audit.py --root .
 python scripts/select_best_submission_candidate.py --root .
 ```
 
+## Honest Sub-0.40 Experiment Gate
+
+The repo includes an experimental structure/assay residual stack for testing
+whether a new independent signal can beat the Suiren/CheMeleon anchor without
+overfitting the 253 revealed Phase 1 rows.
+
+Run it only in an environment with RDKit and scikit-learn installed:
+
+```bash
+python scripts/run_sub040_signal_experiment.py --root . --n-boot 5000
+```
+
+Optional, slower 3D descriptor mode:
+
+```bash
+python scripts/run_sub040_signal_experiment.py --root . --with-3d --n-boot 5000
+```
+
+This command writes:
+
+- `reports/sub040_structure_assay_experiment/experiment_report.md`
+- `reports/sub040_structure_assay_experiment/experiment_summary.json`
+- `reports/sub040_structure_assay_experiment/fold_metrics.csv`
+- `reports/sub040_structure_assay_experiment/region_metrics.csv`
+- `submissions/structure_assay_residual_oof_candidate.csv`
+- `submissions/structure_assay_residual_upload_candidate.csv`
+
+The experiment deliberately does **not** replace
+`submissions/openadmet_pxr_activity_final_submission.csv`. A new candidate is
+eligible for replacement only if the nested-CV acceptance gate passes.
+
 ## Honest Metric Policy
 
 The audit scripts enforce these rules:
@@ -167,6 +198,14 @@ The audit scripts enforce these rules:
 
 This matters because full-fit residual calibration can look excellent while
 overfitting the small revealed set.
+
+The stricter sub-0.40 gate requires:
+
+- zero exact-filled Phase 1 matches in the honest OOF vector
+- nested-CV MAE below `0.410` and RAE below `0.540` for a real improvement claim
+- nested-CV MAE below `0.400` and RAE below `0.520` for a sub-0.40 claim
+- improvement in at least 4 of 5 outer folds
+- paired-bootstrap upper 95% MAE below the current clean baseline point estimate
 
 ## Access Note
 
