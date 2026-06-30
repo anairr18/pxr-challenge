@@ -22,11 +22,26 @@ For slower ETKDG/MMFF shape descriptors:
 python scripts/run_structure_assay_signal_experiment.py --root . --with-3d --n-boot 5000
 ```
 
+For the current cheap orthogonal push recommended by the audit:
+
+```bash
+python scripts/run_orthogonal_signal_experiment.py --root . --n-boot 5000
+```
+
+This turns on 3D descriptors, single-concentration assay-statistic features,
+weighted auxiliary heads, and matched-molecular-pair cliff features. For a quick
+smoke test, add `--no-3d --n-boot 200`. Its candidate files are
+`submissions/orthogonal_signal_oof_candidate.csv` and
+`submissions/orthogonal_signal_upload_candidate.csv`.
+
 ## What It Tests
 
 - Scaffold/bin-stratified outer folds over the 253 revealed Phase 1 molecules.
 - RDKit descriptors, train-fitted ECFP/FCFP SVD components, nearest-neighbor
   activity signals, assay auxiliary predictions, and optional 3D descriptors.
+- Optional single-concentration replicate/statistic features.
+- Optional matched-molecular-pair cliff-risk features.
+- Optional confidence-weighted auxiliary feature heads.
 - Capped residual models on top of the molecular-ensemble anchor.
 - Inner-fold model/config selection only, followed by outer-fold OOF scoring.
 - Activity-region reports for inactive tail, low, mid, high, and active compounds.

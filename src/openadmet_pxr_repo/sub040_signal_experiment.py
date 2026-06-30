@@ -16,6 +16,8 @@ from .metrics import (
     exact_fill_count,
     mae,
     rae_from_mae,
+    region_mae_metrics,
+    spearman_corr,
 )
 
 
@@ -81,9 +83,11 @@ def load_frames(root: Path) -> dict[str, pd.DataFrame]:
     optional = {
         "counter": data / "pxr-challenge_counter-assay_TRAIN.csv",
         "multitask": data / "multitask_train.csv",
+        "single_concentration": data / "pxr-challenge_single_concentration_TRAIN.csv",
     }
     for key, path in optional.items():
         frames[key] = pd.read_csv(path) if path.exists() else pd.DataFrame()
+    frames["mmp_path"] = data / "pxr_train_mmps.json"
     return frames
 
 
@@ -288,6 +292,148 @@ def train_knn_signal_features(
     return pd.DataFrame(rows)
 
 
+def _weighted_reference_features(
+    query_fp: np.ndarray,
+    train_fp: np.ndarray,
+    train_features: pd.DataFrame,
+    *,
+    prefix: str,
+    k: int = 16,
+) -> pd.DataFrame:
+    sim = _tanimoto_dense(query_fp, train_fp)
+    k_eff = min(k, sim.shape[1])
+    idx = np.argpartition(-sim, kth=k_eff - 1, axis=1)[:, :k_eff]
+    values = train_features.reset_index(drop=True).to_numpy(float)
+    columns = list(train_features.columns)
+    rows = []
+    for row_id in range(sim.shape[0]):
+        sims = sim[row_id, idx[row_id]]
+        neigh = values[idx[row_id]]
+        order = np.argsort(-sims)
+        sims = sims[order]
+        neigh = neigh[order]
+        weights = np.maximum(sims, 1e-6) ** 2
+        row = {
+            f"{prefix}_maxsim": float(sims[0]),
+            f"{prefix}_meansim": float(np.mean(sims)),
+        }
+        for col_id, col in enumerate(columns):
+            col_values = neigh[:, col_id]
+            if np.all(~np.isfinite(col_values)):
+                row[f"{prefix}_{col}"] = 0.0
+                continue
+            clean = np.nan_to_num(col_values, nan=float(np.nanmedian(col_values)))
+            row[f"{prefix}_{col}"] = float(np.average(clean, weights=weights))
+        rows.append(row)
+    return pd.DataFrame(rows).astype(np.float32)
+
+
+def _single_concentration_aggregates(single_conc: pd.DataFrame) -> pd.DataFrame:
+    if single_conc.empty or "SMILES" not in single_conc.columns:
+        return pd.DataFrame()
+    df = single_conc.copy()
+    numeric_cols = [
+        "log2_fc_estimate",
+        "log2_fc_stderr",
+        "t_statistic",
+        "p_value",
+        "fdr_bh",
+        "neg_log10_fdr",
+        "median_log2_fc",
+        "n_replicates",
+        "cohens_d",
+        "concentration_M",
+    ]
+    for col in numeric_cols:
+        if col in df.columns:
+            df[col] = pd.to_numeric(df[col], errors="coerce")
+    df["_abs_t"] = df["t_statistic"].abs() if "t_statistic" in df.columns else np.nan
+    df["_abs_cohens_d"] = df["cohens_d"].abs() if "cohens_d" in df.columns else np.nan
+    df["_signed_sig"] = (
+        np.sign(df.get("log2_fc_estimate", np.nan)) * df.get("neg_log10_fdr", np.nan)
+    )
+    if "log2_fc_stderr" in df.columns:
+        inv_var = 1.0 / np.maximum(df["log2_fc_stderr"].to_numpy(float) ** 2, 1e-4)
+        df["_inv_var"] = np.clip(inv_var, 0.0, 1000.0)
+        df["_weighted_log2_fc"] = df.get("log2_fc_estimate", np.nan) * df["_inv_var"]
+    else:
+        df["_inv_var"] = np.nan
+        df["_weighted_log2_fc"] = np.nan
+
+    agg_spec: dict[str, tuple[str, str]] = {
+        "sc_log2fc_mean": ("log2_fc_estimate", "mean"),
+        "sc_log2fc_std": ("log2_fc_estimate", "std"),
+        "sc_log2fc_stderr_mean": ("log2_fc_stderr", "mean"),
+        "sc_t_stat_mean": ("t_statistic", "mean"),
+        "sc_abs_t_max": ("_abs_t", "max"),
+        "sc_neg_log10_fdr_max": ("neg_log10_fdr", "max"),
+        "sc_signed_sig_mean": ("_signed_sig", "mean"),
+        "sc_n_replicates_sum": ("n_replicates", "sum"),
+        "sc_cohens_d_mean": ("cohens_d", "mean"),
+        "sc_abs_cohens_d_max": ("_abs_cohens_d", "max"),
+        "sc_concentration_count": ("concentration_M", "count"),
+        "sc_inv_var_sum": ("_inv_var", "sum"),
+        "sc_weighted_log2fc_sum": ("_weighted_log2_fc", "sum"),
+    }
+    usable = {name: spec for name, spec in agg_spec.items() if spec[0] in df.columns}
+    if not usable:
+        return pd.DataFrame()
+    grouped = df.groupby("SMILES", dropna=False).agg(**usable).reset_index()
+    if {"sc_weighted_log2fc_sum", "sc_inv_var_sum"}.issubset(grouped.columns):
+        denom = grouped["sc_inv_var_sum"].replace(0.0, np.nan)
+        grouped["sc_log2fc_invvar_mean"] = grouped["sc_weighted_log2fc_sum"] / denom
+        grouped = grouped.drop(columns=["sc_weighted_log2fc_sum"])
+    grouped = grouped.replace([np.inf, -np.inf], np.nan)
+    return grouped
+
+
+def _mmp_train_cliff_stats(mmp_path: Path, n_train: int) -> pd.DataFrame:
+    columns = [
+        "mmp_pair_count",
+        "mmp_cliff_count_0p5",
+        "mmp_cliff_count_1p0",
+        "mmp_mean_abs_delta",
+        "mmp_max_abs_delta",
+        "mmp_mean_signed_delta",
+        "mmp_mean_tanimoto",
+    ]
+    if not Path(mmp_path).exists():
+        return pd.DataFrame(np.zeros((n_train, len(columns)), dtype=np.float32), columns=columns)
+    with Path(mmp_path).open("r", encoding="utf-8") as handle:
+        pairs = json.load(handle)
+    sums = {col: np.zeros(n_train, dtype=float) for col in columns}
+    abs_delta_sum = np.zeros(n_train, dtype=float)
+    signed_delta_sum = np.zeros(n_train, dtype=float)
+    tanimoto_sum = np.zeros(n_train, dtype=float)
+    count = np.zeros(n_train, dtype=float)
+    for pair in pairs:
+        ia = int(pair.get("idx_a", -1))
+        ib = int(pair.get("idx_b", -1))
+        if ia == ib or ia < 0 or ib < 0 or ia >= n_train or ib >= n_train:
+            continue
+        tanimoto = float(pair.get("tanimoto", np.nan))
+        if not np.isfinite(tanimoto) or tanimoto < 0.35 or tanimoto > 0.98:
+            continue
+        delta = float(pair.get("delta_pec50", np.nan))
+        if not np.isfinite(delta):
+            continue
+        abs_delta = abs(delta)
+        for idx, signed in ((ia, delta), (ib, -delta)):
+            count[idx] += 1.0
+            abs_delta_sum[idx] += abs_delta
+            signed_delta_sum[idx] += signed
+            tanimoto_sum[idx] += tanimoto
+            sums["mmp_cliff_count_0p5"][idx] += float(abs_delta >= 0.5)
+            sums["mmp_cliff_count_1p0"][idx] += float(abs_delta >= 1.0)
+            sums["mmp_max_abs_delta"][idx] = max(sums["mmp_max_abs_delta"][idx], abs_delta)
+    safe_count = np.maximum(count, 1.0)
+    sums["mmp_pair_count"] = count
+    sums["mmp_mean_abs_delta"] = abs_delta_sum / safe_count
+    sums["mmp_mean_signed_delta"] = signed_delta_sum / safe_count
+    sums["mmp_mean_tanimoto"] = tanimoto_sum / safe_count
+    return pd.DataFrame({col: sums[col] for col in columns}).astype(np.float32)
+
+
 def _stratified_scaffold_folds(phase1: pd.DataFrame, n_splits: int, seed: int) -> np.ndarray:
     from sklearn.model_selection import StratifiedGroupKFold, StratifiedKFold
 
@@ -401,7 +547,7 @@ def _apply_residual(anchor: np.ndarray, residual: np.ndarray, cfg: ResidualConfi
 
 def _score_prediction(y_true: np.ndarray, pred: np.ndarray) -> dict[str, float]:
     m = mae(y_true, pred)
-    return {"mae": m, "rae": rae_from_mae(m)}
+    return {"mae": m, "rae": rae_from_mae(m), "spearman": spearman_corr(y_true, pred)}
 
 
 def _inner_select_config(
@@ -451,24 +597,29 @@ def _fit_auxiliary_predictions(
     train: pd.DataFrame,
     counter: pd.DataFrame,
     multitask: pd.DataFrame,
+    single_concentration: pd.DataFrame,
     x_train: np.ndarray,
     x_query: np.ndarray,
     *,
     seed: int,
+    use_single_concentration: bool = False,
+    use_weighted_aux: bool = False,
 ) -> tuple[pd.DataFrame, list[dict[str, Any]]]:
     from sklearn.ensemble import ExtraTreesRegressor
 
     targets = []
+    train_curve_columns = [
+        "pEC50",
+        "Emax_estimate (log2FC vs. baseline)",
+        "Emax.vs.pos.ctrl_estimate (dimensionless)",
+        "pEC50_std.error (-log10(molarity))",
+        "Emax_std.error (log2FC vs. baseline)",
+        "Emax.vs.pos.ctrl_std.error (dimensionless)",
+        "pEC50_ci.lower (-log10(molarity))",
+        "pEC50_ci.upper (-log10(molarity))",
+    ]
     for name, frame, columns in [
-        (
-            "train",
-            train,
-            [
-                "pEC50",
-                "Emax_estimate (log2FC vs. baseline)",
-                "Emax.vs.pos.ctrl_estimate (dimensionless)",
-            ],
-        ),
+        ("train", train, train_curve_columns),
         (
             "counter",
             counter,
@@ -476,34 +627,58 @@ def _fit_auxiliary_predictions(
                 "pEC50",
                 "Emax_estimate (log2FC vs. baseline)",
                 "Emax.vs.pos.ctrl_estimate (dimensionless)",
+                "pEC50_std.error (-log10(molarity))",
+                "Emax_std.error (log2FC vs. baseline)",
             ],
         ),
-        ("multitask", multitask, ["pEC50", "log2fc_8um", "log2fc_33um"]),
+        (
+            "multitask",
+            multitask,
+            ["pEC50", "pEC50_se", "log2fc_8um", "log2fc_8um_se", "log2fc_33um", "log2fc_33um_se"],
+        ),
     ]:
         if frame.empty:
             continue
         for col in columns:
             if col in frame.columns:
-                targets.append((f"aux_{name}_{col}", frame, col))
+                targets.append((f"aux_{name}_{col}", frame, col, None))
+
+    if use_single_concentration:
+        single_agg = _single_concentration_aggregates(single_concentration)
+        if not single_agg.empty:
+            for col in single_agg.columns:
+                if col != "SMILES":
+                    targets.append((f"aux_single_conc_{col}", single_agg, col, "sc_inv_var_sum"))
 
     out = pd.DataFrame(index=np.arange(x_query.shape[0]))
     report = []
-    for feature_name, frame, col in targets:
+    for feature_name, frame, col, weight_col in targets:
         y = pd.to_numeric(frame[col], errors="coerce")
-        if len(frame) != len(train):
+        sample_weight = None
+        if frame is not train:
             # The auxiliary frame can contain more rows than the main train set. For now,
             # fit only rows whose SMILES overlap the primary train rows so the feature
             # matrix alignment remains unambiguous.
+            merge_cols = ["SMILES", col]
+            if weight_col and weight_col in frame.columns:
+                merge_cols.append(weight_col)
+            merge_cols = list(dict.fromkeys(merge_cols))
             aligned = train[["SMILES"]].merge(
-                frame[["SMILES", col]],
+                frame[merge_cols],
                 on="SMILES",
                 how="left",
                 suffixes=("", "_aux"),
             )
             y = pd.to_numeric(aligned[col], errors="coerce")
+            if use_weighted_aux and weight_col and weight_col in aligned.columns:
+                sample_weight = pd.to_numeric(aligned[weight_col], errors="coerce").to_numpy(float)
         mask = y.notna().to_numpy()
         if int(mask.sum()) < 100:
             continue
+        if sample_weight is not None:
+            sample_weight = np.nan_to_num(sample_weight, nan=1.0, posinf=1.0, neginf=1.0)
+            sample_weight = np.clip(sample_weight, 0.1, 100.0)
+            sample_weight = sample_weight[mask]
         model = ExtraTreesRegressor(
             n_estimators=350,
             min_samples_leaf=6,
@@ -511,7 +686,8 @@ def _fit_auxiliary_predictions(
             random_state=seed,
             n_jobs=-1,
         )
-        model.fit(x_train[mask], y.to_numpy(float)[mask])
+        fit_kwargs = {"sample_weight": sample_weight} if sample_weight is not None else {}
+        model.fit(x_train[mask], y.to_numpy(float)[mask], **fit_kwargs)
         safe_name = (
             feature_name.replace(" ", "_")
             .replace("(", "")
@@ -521,7 +697,14 @@ def _fit_auxiliary_predictions(
             .replace("-", "_")
         )
         out[safe_name] = model.predict(x_query)
-        report.append({"feature": safe_name, "n_labeled": int(mask.sum()), "source_column": col})
+        report.append(
+            {
+                "feature": safe_name,
+                "n_labeled": int(mask.sum()),
+                "source_column": col,
+                "weighted": bool(sample_weight is not None),
+            }
+        )
     return out.astype(np.float32), report
 
 
@@ -530,6 +713,9 @@ def _assemble_signal_matrix(
     *,
     with_3d: bool,
     seed: int,
+    use_single_concentration: bool = False,
+    use_mmps: bool = False,
+    use_weighted_aux: bool = False,
 ) -> dict[str, Any]:
     train = frames["train"].copy()
     phase1 = frames["phase1"].copy()
@@ -584,12 +770,42 @@ def _assemble_signal_matrix(
         train,
         frames["counter"],
         frames["multitask"],
+        frames.get("single_concentration", pd.DataFrame()),
         x_train_for_aux,
         x_query_for_aux,
         seed=seed,
+        use_single_concentration=use_single_concentration,
+        use_weighted_aux=use_weighted_aux,
     )
     aux_phase = aux.iloc[:n_phase].reset_index(drop=True)
     aux_test = aux.iloc[n_phase:].reset_index(drop=True)
+    mmp_report: list[dict[str, Any]] = []
+    if use_mmps:
+        mmp_stats = _mmp_train_cliff_stats(Path(frames.get("mmp_path", "")), n_train)
+        mmp_phase = _weighted_reference_features(
+            fp[sl_phase],
+            fp[sl_train],
+            mmp_stats,
+            prefix="mmp_knn",
+            k=16,
+        )
+        mmp_test = _weighted_reference_features(
+            fp[sl_test],
+            fp[sl_train],
+            mmp_stats,
+            prefix="mmp_knn",
+            k=16,
+        )
+        mmp_report.append(
+            {
+                "feature_block": "mmp_knn",
+                "train_rows": int(n_train),
+                "columns": int(mmp_phase.shape[1]),
+            }
+        )
+    else:
+        mmp_phase = pd.DataFrame(index=np.arange(n_phase))
+        mmp_test = pd.DataFrame(index=np.arange(n_test))
 
     baseline_phase = phase1[["Molecule Name"]].merge(
         baseline[["Molecule Name", "pEC50"]],
@@ -610,6 +826,7 @@ def _assemble_signal_matrix(
             fp_svd_phase,
             knn_phase.reset_index(drop=True),
             aux_phase,
+            mmp_phase.reset_index(drop=True),
             pd.DataFrame({"anchor_pEC50": baseline_phase.to_numpy(float)}),
         ],
         axis=1,
@@ -620,6 +837,7 @@ def _assemble_signal_matrix(
             fp_svd_test,
             knn_test.reset_index(drop=True),
             aux_test,
+            mmp_test.reset_index(drop=True),
             pd.DataFrame({"anchor_pEC50": baseline_test.to_numpy(float)}),
         ],
         axis=1,
@@ -634,6 +852,7 @@ def _assemble_signal_matrix(
         "phase_anchor": baseline_phase.to_numpy(float),
         "test_anchor": baseline_test.to_numpy(float),
         "aux_report": aux_report,
+        "mmp_report": mmp_report,
         "feature_columns": list(phase_meta.columns),
     }
 
@@ -676,7 +895,12 @@ def run_structure_assay_experiment(
     n_boot: int = 5000,
     seed: int = 20260623,
     with_3d: bool = False,
+    use_single_concentration: bool = False,
+    use_mmps: bool = False,
+    use_weighted_aux: bool = False,
     output_dir: Path | None = None,
+    oof_candidate_file: str = OOF_CANDIDATE_FILE,
+    upload_candidate_file: str = UPLOAD_CANDIDATE_FILE,
 ) -> dict[str, Any]:
     _require_modeling_deps()
     root = Path(root)
@@ -687,7 +911,14 @@ def run_structure_assay_experiment(
     phase1 = frames["phase1"].copy()
     test = frames["test"].copy()
     y = _safe_numeric(phase1, "pEC50").to_numpy(float)
-    signals = _assemble_signal_matrix(frames, with_3d=with_3d, seed=seed)
+    signals = _assemble_signal_matrix(
+        frames,
+        with_3d=with_3d,
+        seed=seed,
+        use_single_concentration=use_single_concentration,
+        use_mmps=use_mmps,
+        use_weighted_aux=use_weighted_aux,
+    )
     x_phase = _clean_matrix(signals["phase_meta"].to_numpy(np.float32))
     x_test = _clean_matrix(signals["test_meta"].to_numpy(np.float32))
     anchor = signals["phase_anchor"]
@@ -745,9 +976,22 @@ def run_structure_assay_experiment(
     anchor_score = _score_prediction(y, anchor)
     candidate_score = _score_prediction(y, oof)
     exact = exact_fill_count(y, oof)
-    ci = bootstrap_paired_ci(y, oof, n_boot=n_boot, seed=seed)
+    ci = bootstrap_paired_ci(
+        y,
+        oof,
+        n_boot=n_boot,
+        seed=seed,
+        include_spearman=True,
+        include_regions=True,
+    )
     mae_ci = ci_summary(ci["mae"])
     rae_ci = ci_summary(ci["rae_fixed"])
+    spearman_ci = ci_summary(ci["spearman"])
+    region_ci = {
+        key: ci_summary(values)
+        for key, values in ci.items()
+        if key.startswith("mae_") and key != "mae"
+    }
     corr = float(np.corrcoef(anchor, oof)[0, 1])
     improved_folds = int(fold_report["improved"].sum())
     real_improvement = (
@@ -804,14 +1048,15 @@ def run_structure_assay_experiment(
     ]
 
     submissions = root / "submissions"
-    oof_path = submissions / OOF_CANDIDATE_FILE
-    upload_path = submissions / UPLOAD_CANDIDATE_FILE
+    oof_path = submissions / oof_candidate_file
+    upload_path = submissions / upload_candidate_file
     oof_submission.to_csv(oof_path, index=False)
     upload_candidate.to_csv(upload_path, index=False)
 
     region_report = _region_report(y, anchor, oof)
     region_report.to_csv(output_dir / "region_metrics.csv", index=False)
     pd.DataFrame(signals["aux_report"]).to_csv(output_dir / "auxiliary_feature_report.csv", index=False)
+    pd.DataFrame(signals["mmp_report"]).to_csv(output_dir / "mmp_feature_report.csv", index=False)
 
     summary = {
         "decision": decision,
@@ -823,11 +1068,17 @@ def run_structure_assay_experiment(
         "n_folds": int(n_folds),
         "n_boot": int(n_boot),
         "seed": int(seed),
+        "use_single_concentration": bool(use_single_concentration),
+        "use_mmps": bool(use_mmps),
+        "use_weighted_aux": bool(use_weighted_aux),
         "exact_matches_oof": int(exact),
         "anchor": anchor_score,
         "candidate": candidate_score,
         "mae_ci": mae_ci,
         "rae_fixed_ci": rae_ci,
+        "spearman_ci": spearman_ci,
+        "region_mae": region_mae_metrics(y, oof),
+        "region_mae_ci": region_ci,
         "folds_improved": improved_folds,
         "anchor_candidate_corr": corr,
         "selected_full_fit_config": majority_cfg.label,
@@ -854,11 +1105,18 @@ def run_structure_assay_experiment(
         "",
         f"- Anchor MAE/RAE: {anchor_score['mae']:.6f} / {anchor_score['rae']:.6f}",
         f"- Candidate OOF MAE/RAE: {candidate_score['mae']:.6f} / {candidate_score['rae']:.6f}",
+        f"- Anchor Spearman: {anchor_score['spearman']:.6f}",
+        f"- Candidate Spearman: {candidate_score['spearman']:.6f}",
         f"- Candidate MAE 95% CI: {mae_ci['lo']:.6f} - {mae_ci['hi']:.6f}",
         f"- Candidate RAE 95% CI: {rae_ci['lo']:.6f} - {rae_ci['hi']:.6f}",
+        f"- Candidate Spearman 95% CI: {spearman_ci['lo']:.6f} - {spearman_ci['hi']:.6f}",
         f"- Exact Phase 1 matches in OOF candidate: {exact}",
         f"- Folds improved: {improved_folds}/{n_folds}",
         f"- Anchor/candidate correlation: {corr:.4f}",
+        f"- 3D descriptors: {bool(with_3d)}",
+        f"- Single-concentration features: {bool(use_single_concentration)}",
+        f"- MMP cliff features: {bool(use_mmps)}",
+        f"- Weighted auxiliary heads: {bool(use_weighted_aux)}",
         "",
         "## Files",
         "",

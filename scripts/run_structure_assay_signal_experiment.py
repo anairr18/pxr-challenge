@@ -26,6 +26,21 @@ def main() -> None:
     parser.add_argument("--seed", type=int, default=20260623)
     parser.add_argument("--with-3d", action="store_true", help="Add ETKDG/MMFF 3D descriptors.")
     parser.add_argument(
+        "--use-single-concentration",
+        action="store_true",
+        help="Add predicted features from the single-concentration replicate/statistics table.",
+    )
+    parser.add_argument(
+        "--use-mmps",
+        action="store_true",
+        help="Add train-neighborhood matched-molecular-pair cliff features.",
+    )
+    parser.add_argument(
+        "--use-weighted-aux",
+        action="store_true",
+        help="Use confidence weights when fitting auxiliary feature heads where available.",
+    )
+    parser.add_argument(
         "--output-dir",
         type=Path,
         default=None,
@@ -39,6 +54,9 @@ def main() -> None:
         n_boot=args.n_boot,
         seed=args.seed,
         with_3d=args.with_3d,
+        use_single_concentration=args.use_single_concentration,
+        use_mmps=args.use_mmps,
+        use_weighted_aux=args.use_weighted_aux,
         output_dir=args.output_dir,
     )
     print(json.dumps(summary, indent=2))

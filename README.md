@@ -168,7 +168,33 @@ Optional, slower 3D descriptor mode:
 python scripts/run_structure_assay_signal_experiment.py --root . --with-3d --n-boot 5000
 ```
 
-This command writes:
+The current highest-priority cheap orthogonal push combines:
+
+- ETKDG/MMFF 3D descriptors
+- single-concentration replicate/statistic auxiliary heads
+- confidence-weighted auxiliary fitting where assay uncertainty is available
+- train-neighborhood matched-molecular-pair cliff features
+
+Run the combined experiment:
+
+```bash
+python scripts/run_orthogonal_signal_experiment.py --root . --n-boot 5000
+```
+
+For a faster smoke run that skips conformer generation:
+
+```bash
+python scripts/run_orthogonal_signal_experiment.py --root . --no-3d --n-boot 200
+```
+
+The combined runner writes its own candidate files:
+
+- `submissions/orthogonal_signal_oof_candidate.csv`
+- `submissions/orthogonal_signal_upload_candidate.csv`
+- `reports/orthogonal_signal_experiment/experiment_report.md`
+- `reports/orthogonal_signal_experiment/experiment_summary.json`
+
+The baseline structure/assay runner writes:
 
 - `reports/sub040_structure_assay_experiment/experiment_report.md`
 - `reports/sub040_structure_assay_experiment/experiment_summary.json`
