@@ -207,6 +207,46 @@ The experiment deliberately does **not** replace
 `submissions/activity_predictions_final.csv`. A new candidate is
 eligible for replacement only if the nested-CV acceptance gate passes.
 
+## Remaining Insight Experiments
+
+The last improvement pass tests the remaining lower-risk ideas from the project
+audit before attempting expensive docking:
+
+- curve-aware auxiliary heads from curve-fit, counter-assay, multitask, and
+  single-concentration endpoints
+- applicability-domain features from train-neighborhood similarity and label
+  disagreement
+- prediction-uncertainty shrinkage from the spread across non-exact component
+  files
+
+Run the full batch:
+
+```bash
+python scripts/run_remaining_insights_experiments.py --root . --n-boot 5000
+```
+
+Fast smoke run:
+
+```bash
+python scripts/run_remaining_insights_experiments.py --root . --smoke
+```
+
+Individual runs:
+
+```bash
+python scripts/run_curve_multitask_experiment.py --root . --n-boot 5000
+python scripts/run_domain_uncertainty_gate_experiment.py --root . --n-boot 5000
+```
+
+These scripts preserve `submissions/activity_predictions_final.csv` unless a
+new candidate clears the same nested-CV acceptance gate. Outputs are written to:
+
+- `reports/remaining_insights_summary/experiment_summary.json`
+- `reports/remaining_insights_curve_multitask/`
+- `reports/remaining_insights_domain_gate/`
+- `submissions/curve_multitask_upload_candidate.csv`
+- `submissions/domain_uncertainty_gate_upload_candidate.csv`
+
 ## Genuinely Independent Signal Test
 
 Most prior additions were not independent enough: descriptor trees,
