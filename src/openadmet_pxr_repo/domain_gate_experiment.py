@@ -34,6 +34,10 @@ DOMAIN_OOF_FILE = "domain_uncertainty_gate_oof_candidate.csv"
 DOMAIN_UPLOAD_FILE = "domain_uncertainty_gate_upload_candidate.csv"
 
 
+def _log(message: str) -> None:
+    print(f"[domain-gate] {message}", flush=True)
+
+
 @dataclass(frozen=True)
 class DomainGateConfig:
     local_weight: float
@@ -89,6 +93,7 @@ def _component_uncertainty(
     test: pd.DataFrame,
     y_phase: np.ndarray,
 ) -> tuple[pd.DataFrame, pd.DataFrame, list[dict[str, Any]]]:
+    _log("collecting non-exact component predictions for uncertainty features")
     submissions = Path(root) / "submissions"
     phase_values = []
     test_values = []
@@ -156,6 +161,7 @@ def _domain_features(
     *,
     y_train: np.ndarray,
 ) -> pd.DataFrame:
+    _log(f"computing train-neighborhood domain features for {len(query)} molecules")
     train_fp = _binary_fp(train["SMILES"])
     query_fp = _binary_fp(query["SMILES"])
     knn = train_knn_signal_features(query_fp, train_fp, y_train, k=16)
@@ -296,6 +302,7 @@ def run_domain_gate_experiment(
     output_dir = Path(output_dir or (root / "reports" / "domain_uncertainty_gate_experiment"))
     output_dir.mkdir(parents=True, exist_ok=True)
 
+    _log(f"start root={root} folds={n_folds} n_boot={n_boot}")
     frames = load_frames(root)
     train = frames["train"].copy()
     phase1 = frames["phase1"].copy()
@@ -321,6 +328,7 @@ def run_domain_gate_experiment(
     inner_rows = []
     chosen = []
     for fold in range(n_folds):
+        _log(f"outer fold {fold + 1}/{n_folds}: selecting domain-gate config")
         va = np.flatnonzero(folds == fold)
         tr = np.flatnonzero(folds != fold)
         cfg, inner = _inner_select_gate(y, anchor, phase_features, tr, configs, seed=seed + fold)
@@ -342,6 +350,10 @@ def run_domain_gate_experiment(
                 "improved": bool(cand_score["mae"] < anchor_score["mae"]),
             }
         )
+        _log(
+            f"outer fold {fold + 1}/{n_folds}: "
+            f"anchor_mae={anchor_score['mae']:.6f} candidate_mae={cand_score['mae']:.6f}"
+        )
 
     fold_report = pd.DataFrame(fold_rows)
     inner_report = pd.concat(inner_rows, ignore_index=True)
@@ -353,6 +365,7 @@ def run_domain_gate_experiment(
 
     anchor_score = _score_prediction(y, anchor)
     candidate_score = _score_prediction(y, oof)
+    _log("bootstrapping paired confidence intervals")
     ci = bootstrap_paired_ci(y, oof, n_boot=n_boot, seed=seed, include_spearman=True, include_regions=True)
     exact = exact_fill_count(y, oof)
     improved_folds = int(fold_report["improved"].sum())
@@ -405,6 +418,8 @@ def run_domain_gate_experiment(
     upload_path = submissions / DOMAIN_UPLOAD_FILE
     oof_submission.to_csv(oof_path, index=False)
     upload_candidate.to_csv(upload_path, index=False)
+    _log(f"saved OOF candidate: {oof_path}")
+    _log(f"saved upload candidate: {upload_path}")
 
     summary = {
         "decision": decision,

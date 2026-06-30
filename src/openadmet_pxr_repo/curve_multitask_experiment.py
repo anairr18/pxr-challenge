@@ -43,6 +43,10 @@ CURVE_OOF_FILE = "curve_multitask_oof_candidate.csv"
 CURVE_UPLOAD_FILE = "curve_multitask_upload_candidate.csv"
 
 
+def _log(message: str) -> None:
+    print(f"[curve-multitask] {message}", flush=True)
+
+
 @dataclass(frozen=True)
 class CurveHeadSpec:
     name: str
@@ -342,6 +346,7 @@ def _assemble_curve_signal_matrix(
     *,
     seed: int,
 ) -> dict[str, Any]:
+    _log("loading frames and preparing curve-aware sources")
     frames = load_frames(root)
     train = frames["train"].copy()
     phase1 = frames["phase1"].copy()
@@ -362,6 +367,7 @@ def _assemble_curve_signal_matrix(
         ignore_index=True,
     ).astype(str)
     unique_smiles = pd.Series(sorted(set(all_smiles)))
+    _log(f"building molecular features for {len(unique_smiles)} unique molecules")
     all_x, all_fp = _feature_block_for_smiles(unique_smiles, seed=seed)
     x_by_smiles = {smi: all_x[i] for i, smi in enumerate(unique_smiles)}
     fp_by_smiles = {smi: all_fp[i] for i, smi in enumerate(unique_smiles)}
@@ -380,6 +386,7 @@ def _assemble_curve_signal_matrix(
     fp_test = fp_for(test["SMILES"])
 
     y_train = _safe_numeric(train, "pEC50").to_numpy(float)
+    _log("computing train-neighborhood KNN signals")
     knn_phase = train_knn_signal_features(fp_phase, fp_train, y_train, k=12)
     knn_test = train_knn_signal_features(fp_test, fp_train, y_train, k=12)
 
@@ -389,6 +396,7 @@ def _assemble_curve_signal_matrix(
     specs = _curve_specs(source_frames)
     query_x = np.vstack([x_phase, x_test]).astype(np.float32)
     for spec in specs:
+        _log(f"fitting curve auxiliary head: {spec.name}")
         try:
             query_pred, report = _fit_head_predictions(
                 spec,
@@ -410,6 +418,7 @@ def _assemble_curve_signal_matrix(
     curve_source = source_frames["multitask"].copy()
     curve_cols = [c for c in ["pEC50", "log2fc_8um", "log2fc_33um"] if c in curve_source.columns]
     if not curve_source.empty and curve_cols:
+        _log("building nearest-neighbor curve-profile features")
         curve_source = (
             curve_source[["SMILES"] + curve_cols]
             .assign(**{c: pd.to_numeric(curve_source[c], errors="coerce") for c in curve_cols})
@@ -440,6 +449,7 @@ def _assemble_curve_signal_matrix(
 
     from sklearn.decomposition import TruncatedSVD
 
+    _log("fitting fingerprint SVD block")
     svd = TruncatedSVD(n_components=min(48, fp_train.shape[1] - 1, len(train) - 1), random_state=seed)
     svd.fit(fp_train)
     svd_phase = pd.DataFrame(
@@ -494,6 +504,7 @@ def run_curve_multitask_experiment(
     output_dir = Path(output_dir or (root / "reports" / "curve_multitask_experiment"))
     output_dir.mkdir(parents=True, exist_ok=True)
 
+    _log(f"start root={root} folds={n_folds} n_boot={n_boot}")
     assembled = _assemble_curve_signal_matrix(root, seed=seed)
     frames = assembled["frames"]
     phase1 = frames["phase1"].copy()
@@ -511,6 +522,7 @@ def run_curve_multitask_experiment(
     inner_rows = []
     chosen = []
     for fold in range(n_folds):
+        _log(f"outer fold {fold + 1}/{n_folds}: selecting residual config")
         va = np.flatnonzero(folds == fold)
         tr = np.flatnonzero(folds != fold)
         cfg, inner = _inner_select_config(x_phase, y, anchor, tr, configs, seed=seed + fold)
@@ -533,6 +545,10 @@ def run_curve_multitask_experiment(
                 "improved": bool(cand_score["mae"] < anchor_score["mae"]),
             }
         )
+        _log(
+            f"outer fold {fold + 1}/{n_folds}: "
+            f"anchor_mae={anchor_score['mae']:.6f} candidate_mae={cand_score['mae']:.6f}"
+        )
 
     if np.isnan(oof).any():
         raise RuntimeError("Nested OOF prediction has missing values.")
@@ -545,6 +561,7 @@ def run_curve_multitask_experiment(
 
     anchor_score = _score_prediction(y, anchor)
     candidate_score = _score_prediction(y, oof)
+    _log("bootstrapping paired confidence intervals")
     ci = bootstrap_paired_ci(y, oof, n_boot=n_boot, seed=seed, include_spearman=True, include_regions=True)
     exact = exact_fill_count(y, oof)
     improved_folds = int(fold_report["improved"].sum())
@@ -577,6 +594,7 @@ def run_curve_multitask_experiment(
     chosen_labels = pd.Series([cfg.label for cfg in chosen])
     majority_label = str(chosen_labels.value_counts().index[0])
     majority_cfg = next(cfg for cfg in configs if cfg.label == majority_label)
+    _log(f"fitting full-test residual model with config {majority_cfg.label}")
     full_res = _fit_predict_model(majority_cfg.name, x_phase, y - anchor, x_test, seed=seed)
     corrected_test = _apply_residual(anchor_test, full_res, majority_cfg)
 
@@ -598,6 +616,8 @@ def run_curve_multitask_experiment(
     upload_path = submissions / CURVE_UPLOAD_FILE
     oof_submission.to_csv(oof_path, index=False)
     upload_candidate.to_csv(upload_path, index=False)
+    _log(f"saved OOF candidate: {oof_path}")
+    _log(f"saved upload candidate: {upload_path}")
 
     summary = {
         "decision": decision,

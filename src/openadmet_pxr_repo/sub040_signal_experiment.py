@@ -27,6 +27,10 @@ OOF_CANDIDATE_FILE = "structure_assay_residual_oof_candidate.csv"
 UPLOAD_CANDIDATE_FILE = "structure_assay_residual_upload_candidate.csv"
 
 
+def _log(message: str) -> None:
+    print(f"[structure-assay] {message}", flush=True)
+
+
 @dataclass(frozen=True)
 class ResidualConfig:
     name: str
@@ -717,6 +721,7 @@ def _assemble_signal_matrix(
     use_mmps: bool = False,
     use_weighted_aux: bool = False,
 ) -> dict[str, Any]:
+    _log("assembling molecular/assay feature matrix")
     train = frames["train"].copy()
     phase1 = frames["phase1"].copy()
     test = frames["test"].copy()
@@ -730,6 +735,7 @@ def _assemble_signal_matrix(
         ],
         ignore_index=True,
     )
+    _log(f"building RDKit features for {len(all_smiles)} molecules; with_3d={with_3d}")
     desc, ecfp, fcfp = build_molecular_features(all_smiles["SMILES"], with_3d=with_3d, seed=seed)
     fp = np.hstack([ecfp, fcfp]).astype(np.float32)
     desc_np = _clean_matrix(desc.to_numpy(np.float32))
@@ -742,11 +748,13 @@ def _assemble_signal_matrix(
     sl_test = slice(n_train + n_phase, n_train + n_phase + n_test)
 
     y_train = _safe_numeric(train, "pEC50").to_numpy(float)
+    _log("computing train-neighborhood KNN signals")
     knn_phase = train_knn_signal_features(fp[sl_phase], fp[sl_train], y_train)
     knn_test = train_knn_signal_features(fp[sl_test], fp[sl_train], y_train)
 
     from sklearn.decomposition import TruncatedSVD
 
+    _log("fitting fingerprint SVD block")
     n_components = min(64, max(2, fp[sl_train].shape[0] - 1), fp[sl_train].shape[1] - 1)
     svd = TruncatedSVD(n_components=n_components, random_state=seed)
     svd.fit(fp[sl_train])
@@ -766,6 +774,7 @@ def _assemble_signal_matrix(
             np.vstack([fp[sl_phase], fp[sl_test]]),
         ]
     ).astype(np.float32)
+    _log("fitting auxiliary assay prediction heads")
     aux, aux_report = _fit_auxiliary_predictions(
         train,
         frames["counter"],
@@ -781,6 +790,7 @@ def _assemble_signal_matrix(
     aux_test = aux.iloc[n_phase:].reset_index(drop=True)
     mmp_report: list[dict[str, Any]] = []
     if use_mmps:
+        _log("building matched-molecular-pair neighborhood features")
         mmp_stats = _mmp_train_cliff_stats(Path(frames.get("mmp_path", "")), n_train)
         mmp_phase = _weighted_reference_features(
             fp[sl_phase],
@@ -907,6 +917,7 @@ def run_structure_assay_experiment(
     output_dir = Path(output_dir or (root / "reports" / "sub040_structure_assay_experiment"))
     output_dir.mkdir(parents=True, exist_ok=True)
 
+    _log(f"start root={root} folds={n_folds} n_boot={n_boot}")
     frames = load_frames(root)
     phase1 = frames["phase1"].copy()
     test = frames["test"].copy()
@@ -936,6 +947,7 @@ def run_structure_assay_experiment(
     inner_rows = []
     chosen_configs: list[ResidualConfig] = []
     for fold in range(n_folds):
+        _log(f"outer fold {fold + 1}/{n_folds}: selecting residual config")
         val_idx = np.flatnonzero(folds == fold)
         train_idx = np.flatnonzero(folds != fold)
         cfg, inner = _inner_select_config(x_phase, y, anchor, train_idx, configs, seed=seed + fold)
@@ -964,6 +976,10 @@ def run_structure_assay_experiment(
                 "improved": bool(cand_score["mae"] < base_score["mae"]),
             }
         )
+        _log(
+            f"outer fold {fold + 1}/{n_folds}: "
+            f"anchor_mae={base_score['mae']:.6f} candidate_mae={cand_score['mae']:.6f}"
+        )
 
     if np.isnan(oof).any():
         raise RuntimeError("Nested OOF prediction has missing values.")
@@ -976,6 +992,7 @@ def run_structure_assay_experiment(
     anchor_score = _score_prediction(y, anchor)
     candidate_score = _score_prediction(y, oof)
     exact = exact_fill_count(y, oof)
+    _log("bootstrapping paired confidence intervals")
     ci = bootstrap_paired_ci(
         y,
         oof,
@@ -1019,6 +1036,7 @@ def run_structure_assay_experiment(
     chosen_labels = pd.Series([cfg.label for cfg in chosen_configs])
     majority_label = str(chosen_labels.value_counts().index[0])
     majority_cfg = next(cfg for cfg in configs if cfg.label == majority_label)
+    _log(f"fitting full-test residual model with config {majority_cfg.label}")
     full_residual = _fit_predict_model(
         majority_cfg.name,
         x_phase,
@@ -1052,6 +1070,8 @@ def run_structure_assay_experiment(
     upload_path = submissions / upload_candidate_file
     oof_submission.to_csv(oof_path, index=False)
     upload_candidate.to_csv(upload_path, index=False)
+    _log(f"saved OOF candidate: {oof_path}")
+    _log(f"saved upload candidate: {upload_path}")
 
     region_report = _region_report(y, anchor, oof)
     region_report.to_csv(output_dir / "region_metrics.csv", index=False)
