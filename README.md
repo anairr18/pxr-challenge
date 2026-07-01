@@ -276,6 +276,40 @@ The upload candidate is experimental. Keep
 `submissions/activity_predictions_final.csv` locked unless the external-signal
 report returns a review-for-replacement decision.
 
+## Counter-Weighted Asymmetric Graph Test
+
+Public model reports suggested one remaining high-value idea that is genuinely
+different from the descriptor/residual stack: train a graph model with
+counter-assay reliability weights, add low-weight single-concentration
+pseudo-labels, and use an asymmetric activity classifier so inactive molecules
+are not systematically overpredicted.
+
+This runner implements that idea without changing the locked final submission:
+
+```bash
+python scripts/run_asymmetric_graph_experiment.py --root . --epochs 80 --n-boot 5000
+```
+
+Fast smoke run:
+
+```bash
+python scripts/run_asymmetric_graph_experiment.py --root . --smoke --n-boot 500
+```
+
+The script writes:
+
+- `reports/asymmetric_graph_experiment/experiment_report.md`
+- `reports/asymmetric_graph_experiment/experiment_summary.json`
+- `reports/asymmetric_graph_experiment/fold_metrics.csv`
+- `submissions/asymmetric_counter_graph_oof_candidate.csv`
+- `submissions/asymmetric_counter_graph_upload_candidate.csv`
+- `submissions/asymmetric_counter_graph_clean_upload_candidate.csv`
+
+The graph upload candidate should only replace
+`submissions/activity_predictions_final.csv` if the report returns a
+replacement-grade decision. The honest metric is the OOF candidate, not the
+exact-filled upload file.
+
 ## Honest Metric Policy
 
 The audit scripts enforce these rules:

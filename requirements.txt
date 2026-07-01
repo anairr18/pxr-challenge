@@ -6,3 +6,4 @@ pyarrow
 rdkit
 lightgbm
 xgboost
+torch>=2.0
